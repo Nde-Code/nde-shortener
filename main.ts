@@ -148,15 +148,13 @@ async function handler(req: Request): Promise<Response> {
 
 		if (data && Object.prototype.hasOwnProperty.call(data, id)) {
 
-			const url: string = data[id].long_url;
-
 			return new Response(null, {
 
 				status: 302,
 
 				headers: {
 
-					Location: url,
+					Location: data[id].long_url.toString()
 
 				},
 
@@ -182,20 +180,97 @@ async function handler(req: Request): Promise<Response> {
 
 	}
 
-	// Ajouter les cors headers
-	// Try ctach firebase (write/read)
-	// You do isValidUrl, but consider also limiting max length or sanitizing inputs.
   	if (req.method === "POST" && pathname === "/post-url") {
 
-		const data: { long_url: string } | null = await parseJsonBody<{ long_url: string }>(req);
+		let data: { long_url: string } | null = null;
 
-		if (!data) return new Response(JSON.stringify({ "error": "The body of the POST request is not valid. Please refer to the documentation before sending the request." }), { status: 400 });
+		try {
 
-		if (!data.long_url) return new Response(JSON.stringify({ "error": "The field 'long_url' is required but missing." }), { status: 400 });
+			data = await parseJsonBody<{ long_url: string }>(req);
 
-		if (!isValidUrl(data.long_url)) return new Response(JSON.stringify({ "error": "The provided long_url is not in a valid URL format." }), { status: 400 });
+		} catch(_err) {
 
-		const completeDB: JsonURLMapOfFullDB | null = await readInFirebaseRTDB<JsonURLMapOfFullDB>(config.FIREBASE_URL, config.FIREBASE_HIDDEN_PATH);
+			return new Response(JSON.stringify({ "error": "Failed to fetch data from database. Please try again later." }), {
+
+				status: 500,
+
+				headers: {
+
+					"Content-Type": "application/json",
+
+					"Access-Control-Allow-Origin": "*"
+
+				},
+
+			});
+
+		}
+
+		if (!data) return new Response(JSON.stringify({ "error": "The body of the POST request is not valid. Please refer to the documentation before sending the request." }), {
+			
+			status: 400,
+
+			headers: {
+					
+				"Content-Type": "application/json",
+
+				"Access-Control-Allow-Origin": "*"
+				
+			},
+		
+		});
+
+		if (!data.long_url) return new Response(JSON.stringify({ "error": "The field 'long_url' is required but missing." }), {
+			
+			status: 400,
+
+			headers: {
+					
+				"Content-Type": "application/json",
+
+				"Access-Control-Allow-Origin": "*"
+				
+			},
+		
+		});
+
+		if (!isValidUrl(data.long_url)) return new Response(JSON.stringify({ "error": "The provided long_url is not in a valid URL format." }), {
+			
+			status: 400,
+
+			headers: {
+					
+				"Content-Type": "application/json",
+
+				"Access-Control-Allow-Origin": "*"
+				
+			},
+		
+		});
+
+		let completeDB: JsonURLMapOfFullDB | null = null;
+
+		try {
+
+			completeDB = await readInFirebaseRTDB<JsonURLMapOfFullDB>(config.FIREBASE_URL, config.FIREBASE_HIDDEN_PATH);
+
+		} catch(_err) {
+
+			return new Response(JSON.stringify({ "error": "Failed to fetch data from database. Please try again later." }), {
+
+				status: 500,
+
+				headers: {
+
+					"Content-Type": "application/json",
+
+					"Access-Control-Allow-Origin": "*"
+
+				},
+
+			});
+
+		}
 
 		if (completeDB && Object.keys(completeDB).length > 0) {
 
@@ -217,11 +292,33 @@ async function handler(req: Request): Promise<Response> {
 
 		const path: string = `/${config.FIREBASE_HIDDEN_PATH}/${randomLinkString}`;
 
-		const result: jsonURLFormat = await postInFirebaseRTDB<jsonURLFormat, jsonURLFormat>(config.FIREBASE_URL, path, firebaseData);
+		let result: jsonURLFormat | null = null;
+
+		try {
+
+			result = await postInFirebaseRTDB<jsonURLFormat, jsonURLFormat>(config.FIREBASE_URL, path, firebaseData);
+
+		} catch(_err) {
+
+			return new Response(JSON.stringify({ "error": "Failed to fetch data from database. Please try again later." }), {
+
+				status: 500,
+
+				headers: {
+
+					"Content-Type": "application/json",
+
+					"Access-Control-Allow-Origin": "*"
+
+				},
+
+			});
+
+		}
 
 		let firebaseResponse: string = "Link hasn't been generated due to an internal server error.";
 
-		if (result && JSON.stringify(result) === JSON.stringify(firebaseData)) firebaseResponse = `${url.origin}/url/${randomLinkString}`;
+		if (result && (result.long_url === firebaseData.long_url) && (result.post_date === firebaseData.post_date)) firebaseResponse = `${url.origin}/url/${randomLinkString}`;
 
 		return new Response(JSON.stringify({ link: firebaseResponse }), {
 			
@@ -239,7 +336,19 @@ async function handler(req: Request): Promise<Response> {
 	
 	}
 
-	return new Response(JSON.stringify({ "error": "The requested endpoint is invalid." }), { status: 404 });
+	return new Response(JSON.stringify({ "error": "The requested endpoint is invalid." }), {
+		
+		status: 404,
+
+		headers: {
+					
+			"Content-Type": "application/json",
+
+			"Access-Control-Allow-Origin": "*"
+				
+		},
+	
+	});
 
 }
 

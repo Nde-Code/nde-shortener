@@ -2,30 +2,22 @@ export async function postInFirebaseRTDB<T, U>(FIREBASE_URL: string, path: strin
 
     const url: string = `${FIREBASE_URL}${path}.json`;
 
-    try {
+    const res: Response = await fetch(url, {
 
-        const res: Response = await fetch(url, {
+        method: "PUT",
 
-            method: "PUT",
+        headers: {
 
-            headers: {
+            "Content-Type": "application/json",
 
-                "Content-Type": "application/json",
+        },
 
-            },
+        body: JSON.stringify(data),
 
-            body: JSON.stringify(data),
+    });
 
-        });
+    if (!res.ok) throw new Error(`Firebase error (${res.status}) !`);
 
-        if (!res.ok) throw new Error(`Firebase error (${res.status}) !`);
-
-        return (await res.json()) as T;
-
-    } catch (error) {
-
-        throw error;
-        
-    }
+    return (await res.json()) as T;
 
 }

@@ -22,9 +22,7 @@ export async function readInFirebaseRTDB<T>(FIREBASE_URL: string, path: string):
         
         return data;
 
-    } catch (err) {
-
-        console.error(err);
+    } catch (_err) {
 
         return null;
 
