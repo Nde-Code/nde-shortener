@@ -6,6 +6,8 @@ import { jsonURLFormat, jsonURLMap, JsonURLMapOfFullDB } from "./types/types.ts"
 
 import { parseJsonBody, checkGlobalRateLimit, findUrlKey, isValidUrl, generateRandomString } from "./utilities/small.ts";
 
+import { createJsonResponse } from "./utilities/http_response.ts";
+
 import { config } from "./config.ts";
 
 async function handler(req: Request): Promise<Response> {
@@ -36,27 +38,11 @@ async function handler(req: Request): Promise<Response> {
 
 	}
 
-	if (!checkGlobalRateLimit()) {
+	if (!checkGlobalRateLimit()) return createJsonResponse({ "error": "Rate limit exceeded: only 1 request per second allowed globally." }, 429);
 
-		return new Response(JSON.stringify({ error: "Rate limit exceeded: only 1 request per second allowed globally." }), {
+	if (!config.FIREBASE_URL) return createJsonResponse({ "error": "Your Firebase host link is missing. Please check your .env file !" }, 500);
 
-			status: 429,
-
-			headers: {
-				
-				"Content-Type": "application/json",
-
-				"Access-Control-Allow-Origin": "*"
-			
-			},
-
-		});
-
-  	}
-
-	if (!config.FIREBASE_URL) return new Response(JSON.stringify({ "error": "Your Firebase host link is missing. Please check your .env file !" }), { status: 500 });
-
-	if (!config.FIREBASE_HIDDEN_PATH) return new Response(JSON.stringify({ "error": "The secret path for your database is missing. Please check your .env file." }), { status: 500 });
+	if (!config.FIREBASE_HIDDEN_PATH) return createJsonResponse({ "error": "The secret path for your database is missing. Please check your .env file." }, 500);
 
 	if (req.method === "GET" && pathname === "/urls") {
 
@@ -68,35 +54,11 @@ async function handler(req: Request): Promise<Response> {
 
 		} catch(_err) {
 
-			return new Response(JSON.stringify({ "error": "Failed to fetch data from database. Please try again later." }), {
-
-				status: 500,
-
-				headers: {
-
-					"Content-Type": "application/json",
-
-					"Access-Control-Allow-Origin": "*"
-
-				},
-
-			});
+			return createJsonResponse({ "error": "Failed to fetch data from database. Please try again later." }, 500);
 
 		}
 
-		return new Response(JSON.stringify(data), {
-
-			status: 200,
-
-			headers: {
-				
-				"Content-Type": "application/json",
-
-				"Access-Control-Allow-Origin": "*"
-			
-			},
-
-		});
+		return createJsonResponse(data ?? {}, 200);
 
 	}
 
@@ -112,39 +74,11 @@ async function handler(req: Request): Promise<Response> {
 
 		} catch(_err) {
 
-			return new Response(JSON.stringify({ "error": "Failed to fetch data from database. Please try again later." }), {
-
-				status: 500,
-
-				headers: {
-
-					"Content-Type": "application/json",
-
-					"Access-Control-Allow-Origin": "*"
-
-				},
-
-			});
+			return createJsonResponse({ "error": "Failed to fetch data from database. Please try again later." }, 500);
 
 		}
 
-		if (!id) {
-
-			return new Response(JSON.stringify({ "error": "URL ID is missing." }), {
-
-				status: 400,
-
-				headers: {
-					
-					"Content-Type": "application/json",
-					
-					"Access-Control-Allow-Origin": "*"
-				
-				},
-
-			});
-
-  		}
+		if (!id) return createJsonResponse({ "error": "URL ID is missing." }, 400);
 
 		if (data && Object.prototype.hasOwnProperty.call(data, id)) {
 
@@ -162,19 +96,7 @@ async function handler(req: Request): Promise<Response> {
 
 		} else {
 
-			return new Response(JSON.stringify({ "error": "This link was not found in the database. Sorry !" }), {
-
-				status: 404,
-
-				headers: {
-					
-					"Content-Type": "application/json",
-
-					"Access-Control-Allow-Origin": "*"
-				
-				},
-
-			});
+			return createJsonResponse({ "error": "This link was not found in the database. Sorry !" }, 404);
 
 		}
 
@@ -190,63 +112,15 @@ async function handler(req: Request): Promise<Response> {
 
 		} catch(_err) {
 
-			return new Response(JSON.stringify({ "error": "Failed to fetch data from database. Please try again later." }), {
-
-				status: 500,
-
-				headers: {
-
-					"Content-Type": "application/json",
-
-					"Access-Control-Allow-Origin": "*"
-
-				},
-
-			});
+			return createJsonResponse({ "error": "Failed to fetch data from database. Please try again later." }, 500);
 
 		}
 
-		if (!data) return new Response(JSON.stringify({ "error": "The body of the POST request is not valid. Please refer to the documentation before sending the request." }), {
-			
-			status: 400,
+		if (!data) return createJsonResponse({ "error": "The body of the POST request is not valid. Please refer to the documentation before sending the request." }, 400);
 
-			headers: {
-					
-				"Content-Type": "application/json",
+		if (!data.long_url) return createJsonResponse({ "error": "The field 'long_url' is required but missing." }, 400);
 
-				"Access-Control-Allow-Origin": "*"
-				
-			},
-		
-		});
-
-		if (!data.long_url) return new Response(JSON.stringify({ "error": "The field 'long_url' is required but missing." }), {
-			
-			status: 400,
-
-			headers: {
-					
-				"Content-Type": "application/json",
-
-				"Access-Control-Allow-Origin": "*"
-				
-			},
-		
-		});
-
-		if (!isValidUrl(data.long_url)) return new Response(JSON.stringify({ "error": "The provided long_url is not in a valid URL format." }), {
-			
-			status: 400,
-
-			headers: {
-					
-				"Content-Type": "application/json",
-
-				"Access-Control-Allow-Origin": "*"
-				
-			},
-		
-		});
+		if (!isValidUrl(data.long_url)) return createJsonResponse({ "error": "The provided long_url is not in a valid URL format." }, 400);
 
 		let completeDB: JsonURLMapOfFullDB | null = null;
 
@@ -256,19 +130,7 @@ async function handler(req: Request): Promise<Response> {
 
 		} catch(_err) {
 
-			return new Response(JSON.stringify({ "error": "Failed to fetch data from database. Please try again later." }), {
-
-				status: 500,
-
-				headers: {
-
-					"Content-Type": "application/json",
-
-					"Access-Control-Allow-Origin": "*"
-
-				},
-
-			});
+			return createJsonResponse({ "error": "Failed to fetch data from database. Please try again later." }, 500);
 
 		}
 
@@ -276,7 +138,7 @@ async function handler(req: Request): Promise<Response> {
 
 			const foundKey = findUrlKey(completeDB, data.long_url);
 
-			if (foundKey !== null) return new Response(JSON.stringify({ "error": "The URL is already in the database", link: `${url.origin}/url/${foundKey}` }),{ status: 409, headers: { "Content-Type": "application/json" } });
+			if (foundKey !== null) return createJsonResponse({ "error": "The URL is already in the database", link: `${url.origin}/url/${foundKey}` }, 409);
 		
 		}
 
@@ -300,19 +162,7 @@ async function handler(req: Request): Promise<Response> {
 
 		} catch(_err) {
 
-			return new Response(JSON.stringify({ "error": "Failed to fetch data from database. Please try again later." }), {
-
-				status: 500,
-
-				headers: {
-
-					"Content-Type": "application/json",
-
-					"Access-Control-Allow-Origin": "*"
-
-				},
-
-			});
+			return createJsonResponse({ "error": "Failed to fetch data from database. Please try again later." }, 500);
 
 		}
 
@@ -320,35 +170,11 @@ async function handler(req: Request): Promise<Response> {
 
 		if (result && (result.long_url === firebaseData.long_url) && (result.post_date === firebaseData.post_date)) firebaseResponse = `${url.origin}/url/${randomLinkString}`;
 
-		return new Response(JSON.stringify({ link: firebaseResponse }), {
-			
-			status: 201,
-			
-			headers: {
-				
-				"Content-Type": "application/json",
-
-				"Access-Control-Allow-Origin": "*"
-			
-			}
-		
-		});
+		return createJsonResponse({ link: firebaseResponse }, 201);
 	
 	}
 
-	return new Response(JSON.stringify({ "error": "The requested endpoint is invalid." }), {
-		
-		status: 404,
-
-		headers: {
-					
-			"Content-Type": "application/json",
-
-			"Access-Control-Allow-Origin": "*"
-				
-		},
-	
-	});
+	return createJsonResponse({ "error": "The requested endpoint is invalid." }, 404);
 
 }
 
