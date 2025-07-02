@@ -38,11 +38,11 @@ async function handler(req: Request): Promise<Response> {
 
 	}
 
-	if (!checkGlobalRateLimit()) return createJsonResponse({ "error": "Rate limit exceeded: only 1 request per second allowed globally." }, 429);
+	if (!checkGlobalRateLimit()) return createJsonResponse({ "error": "Rate limit exceeded: only 1 request per second allowed globally." }, 429, config.ORIGIN_ERROR);
 
-	if (!config.FIREBASE_URL) return createJsonResponse({ "error": "Your Firebase host link is missing. Please check your .env file !" }, 500);
+	if (!config.FIREBASE_URL) return createJsonResponse({ "error": "Your Firebase host link is missing. Please check your .env file !" }, 500, config.ORIGIN_ERROR);
 
-	if (!config.FIREBASE_HIDDEN_PATH) return createJsonResponse({ "error": "The secret path for your database is missing. Please check your .env file." }, 500);
+	if (!config.FIREBASE_HIDDEN_PATH) return createJsonResponse({ "error": "The secret path for your database is missing. Please check your .env file." }, 500, config.ORIGIN_ERROR);
 
 	if (req.method === "GET" && pathname === "/urls") {
 
@@ -54,11 +54,11 @@ async function handler(req: Request): Promise<Response> {
 
 		} catch(_err) {
 
-			return createJsonResponse({ "error": "Failed to fetch data from database. Please try again later." }, 500);
+			return createJsonResponse({ "error": "Failed to fetch data from database. Please try again later." }, 500, config.ORIGIN_ERROR);
 
 		}
 
-		return createJsonResponse(data ?? {}, 200);
+		return createJsonResponse(data ?? {}, 200, config.ORIGIN_FOR_DB_LIST);
 
 	}
 
@@ -74,11 +74,11 @@ async function handler(req: Request): Promise<Response> {
 
 		} catch(_err) {
 
-			return createJsonResponse({ "error": "Failed to fetch data from database. Please try again later." }, 500);
+			return createJsonResponse({ "error": "Failed to fetch data from database. Please try again later." }, 500, config.ORIGIN_ERROR);
 
 		}
 
-		if (!id) return createJsonResponse({ "error": "URL ID is missing." }, 400);
+		if (!id) return createJsonResponse({ "error": "URL ID is missing." }, 400, config.ORIGIN_ERROR);
 
 		if (data && Object.prototype.hasOwnProperty.call(data, id)) {
 
@@ -96,7 +96,7 @@ async function handler(req: Request): Promise<Response> {
 
 		} else {
 
-			return createJsonResponse({ "error": "This link was not found in the database. Sorry !" }, 404);
+			return createJsonResponse({ "error": "This link was not found in the database. Sorry !" }, 404, config.ORIGIN_ERROR);
 
 		}
 
@@ -112,15 +112,15 @@ async function handler(req: Request): Promise<Response> {
 
 		} catch(_err) {
 
-			return createJsonResponse({ "error": "Failed to fetch data from database. Please try again later." }, 500);
+			return createJsonResponse({ "error": "Failed to fetch data from database. Please try again later." }, 500, config.ORIGIN_ERROR);
 
 		}
 
-		if (!data) return createJsonResponse({ "error": "The body of the POST request is not valid. Please refer to the documentation before sending the request." }, 400);
+		if (!data) return createJsonResponse({ "error": "The body of the POST request is not valid. Please refer to the documentation before sending the request." }, 400, config.ORIGIN_ERROR);
 
-		if (!data.long_url) return createJsonResponse({ "error": "The field 'long_url' is required but missing." }, 400);
+		if (!data.long_url) return createJsonResponse({ "error": "The field 'long_url' is required but missing." }, 400, config.ORIGIN_ERROR);
 
-		if (!isValidUrl(data.long_url)) return createJsonResponse({ "error": "The provided long_url is not in a valid URL format." }, 400);
+		if (!isValidUrl(data.long_url)) return createJsonResponse({ "error": "The provided long_url is not in a valid URL format." }, 400, config.ORIGIN_ERROR);
 
 		let completeDB: JsonURLMapOfFullDB | null = null;
 
@@ -130,7 +130,7 @@ async function handler(req: Request): Promise<Response> {
 
 		} catch(_err) {
 
-			return createJsonResponse({ "error": "Failed to fetch data from database. Please try again later." }, 500);
+			return createJsonResponse({ "error": "Failed to fetch data from database. Please try again later." }, 500, config.ORIGIN_ERROR);
 
 		}
 
@@ -138,7 +138,7 @@ async function handler(req: Request): Promise<Response> {
 
 			const foundKey = findUrlKey(completeDB, data.long_url);
 
-			if (foundKey !== null) return createJsonResponse({ "error": "The URL is already in the database", link: `${url.origin}/url/${foundKey}` }, 409);
+			if (foundKey !== null) return createJsonResponse({ "error": "The URL is already in the database", link: `${url.origin}/url/${foundKey}` }, 409, config.ORIGIN_ERROR);
 		
 		}
 
@@ -162,7 +162,7 @@ async function handler(req: Request): Promise<Response> {
 
 		} catch(_err) {
 
-			return createJsonResponse({ "error": "Failed to fetch data from database. Please try again later." }, 500);
+			return createJsonResponse({ "error": "Failed to fetch data from database. Please try again later." }, 500, config.ORIGIN_ERROR);
 
 		}
 
@@ -170,11 +170,11 @@ async function handler(req: Request): Promise<Response> {
 
 		if (result && (result.long_url === firebaseData.long_url) && (result.post_date === firebaseData.post_date)) firebaseResponse = `${url.origin}/url/${randomLinkString}`;
 
-		return createJsonResponse({ link: firebaseResponse }, 201);
+		return createJsonResponse({ link: firebaseResponse }, 201, config.ORIGIN_FOR_POST);
 	
 	}
 
-	return createJsonResponse({ "error": "The requested endpoint is invalid." }, 404);
+	return createJsonResponse({ "error": "The requested endpoint is invalid." }, 404, config.ORIGIN_ERROR);
 
 }
 

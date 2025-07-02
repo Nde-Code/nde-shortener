@@ -1,4 +1,10 @@
+import { config } from "../config.ts";
+
 export async function readInFirebaseRTDB<T>(FIREBASE_URL: string, path: string): Promise<T | null> {
+
+    const controller = new AbortController();
+
+    const timeoutId = setTimeout(() => controller.abort(), config.FIREBASE_TIMEOUT);
 
     try {
 
@@ -16,6 +22,8 @@ export async function readInFirebaseRTDB<T>(FIREBASE_URL: string, path: string):
 
         });
 
+        clearTimeout(timeoutId);
+
         if (!res.ok) return null;
 
         const data: T = await res.json();
@@ -23,6 +31,8 @@ export async function readInFirebaseRTDB<T>(FIREBASE_URL: string, path: string):
         return data;
 
     } catch (_err) {
+
+        clearTimeout(timeoutId);
 
         return null;
 

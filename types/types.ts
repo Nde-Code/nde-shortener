@@ -8,6 +8,14 @@ export interface Config {
 
     FIREBASE_HIDDEN_PATH: string;
 
+    FIREBASE_TIMEOUT: number;
+
+    ORIGIN_FOR_DB_LIST: string;
+
+    ORIGIN_FOR_POST: string;
+
+    ORIGIN_ERROR: string;
+
 }
 
 export interface jsonURLFormat {

@@ -1,4 +1,5 @@
 import { JsonURLMapOfFullDB  } from "../types/types.ts";
+
 import { config } from '../config.ts'
 
 export function findUrlKey(data: JsonURLMapOfFullDB, urlToCheck: string): string | null {
@@ -28,6 +29,8 @@ export function isValidUrl(url: string): boolean {
         if (!parsed.hostname.includes(".")) return false;
 
         if (parsed.hostname.split('.').some(label => label.length === 0)) return false;
+
+        if (["localhost", "127.0.0.1", "::1"].includes(parsed.hostname)) return false;
 
         return true;
 

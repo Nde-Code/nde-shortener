@@ -1,4 +1,4 @@
-export function createJsonResponse(body: object, status = 200, headers: HeadersInit = {}): Response {
+export function createJsonResponse(body: object, status: number = 200, origin: string, headers: HeadersInit = {}): Response {
 
     return new Response(JSON.stringify(body), {
 
@@ -8,7 +8,7 @@ export function createJsonResponse(body: object, status = 200, headers: HeadersI
 
             "Content-Type": "application/json",
 
-            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Origin": origin,
 
             ...headers,
 

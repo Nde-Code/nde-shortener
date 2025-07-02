@@ -10,4 +10,12 @@ export const config: Config = {
 
     FIREBASE_HIDDEN_PATH: Deno.env.get("FIREBASE_HIDDEN_PATH") ?? "",
 
+    FIREBASE_TIMEOUT: 5000,
+
+    ORIGIN_FOR_DB_LIST: "*",
+
+    ORIGIN_FOR_POST: "*",
+
+    ORIGIN_ERROR: "*"
+
 };
