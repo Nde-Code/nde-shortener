@@ -2,7 +2,7 @@ import { postInFirebaseRTDB } from "./utilities/post.ts";
 
 import { readInFirebaseRTDB } from "./utilities/read.ts";
 
-import { jsonURLFormat, jsonURLMap, JsonURLMapOfFullDB } from "./types/types.ts";
+import { jsonURLFormat, jsonURLMap, JsonURLMapOfFullDB, postBODYType } from "./types/types.ts";
 
 import { parseJsonBody, checkGlobalRateLimit, findUrlKey, isValidUrl, generateRandomString } from "./utilities/small.ts";
 
@@ -104,11 +104,11 @@ async function handler(req: Request): Promise<Response> {
 
   	if (req.method === "POST" && pathname === "/post-url") {
 
-		let data: { long_url: string } | null = null;
+		let data: postBODYType | null = null;
 
 		try {
 
-			data = await parseJsonBody<{ long_url: string }>(req);
+			data = await parseJsonBody<postBODYType>(req);
 
 		} catch(_err) {
 
