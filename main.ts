@@ -18,9 +18,7 @@ async function handler(req: Request): Promise<Response> {
 
 	if (!checkGlobalRateLimit()) return createJsonResponse({ "error": "Rate limit exceeded: only 1 request per second allowed globally." }, 429);
 
-	if (!config.FIREBASE_URL) return createJsonResponse({ "error": "Your Firebase host link is missing. Please check your .env file !" }, 500);
-
-	if (!config.FIREBASE_HIDDEN_PATH) return createJsonResponse({ "error": "The secret path for your database is missing. Please check your .env file." }, 500);
+	if (!config.FIREBASE_URL || !config.FIREBASE_HIDDEN_PATH) return createJsonResponse({ "error": "Your Firebase credentials are missing. Please check your .env file." }, 500);
 
 	if (req.method === "OPTIONS") {
 
@@ -46,7 +44,7 @@ async function handler(req: Request): Promise<Response> {
 
 	if (req.method === "GET" && pathname === "/urls") {
 
-		const data: jsonURLFormat | null = await readInFirebaseRTDB<jsonURLFormat>(config.FIREBASE_URL, config.FIREBASE_HIDDEN_PATH);;
+		const data: jsonURLFormat | null = await readInFirebaseRTDB<jsonURLFormat>(config.FIREBASE_URL, config.FIREBASE_HIDDEN_PATH);
 
 		return createJsonResponse(data ?? {}, 200);
 
@@ -56,11 +54,11 @@ async function handler(req: Request): Promise<Response> {
 
 		const id: string = pathname.split("/")[2];
 
-		const data: jsonURLMap | null = await readInFirebaseRTDB<jsonURLMap>(config.FIREBASE_URL, config.FIREBASE_HIDDEN_PATH);;
-
 		if (!id) return createJsonResponse({ "error": "URL ID is missing." }, 400);
 
-		else if (data && Object.prototype.hasOwnProperty.call(data, id)) {
+		const data: jsonURLMap | null = await readInFirebaseRTDB<jsonURLMap>(config.FIREBASE_URL, config.FIREBASE_HIDDEN_PATH);
+
+		if (data && Object.prototype.hasOwnProperty.call(data, id)) {
 
 			return new Response(null, {
 
@@ -104,13 +102,15 @@ async function handler(req: Request): Promise<Response> {
 		
 		}
 
+		if (completeDB && Object.keys(completeDB).length > config.FIREBASE_ENTRIES_LIMIT) return createJsonResponse({ "error": "The database has reached the limit of entries." }, 507);
+
 		const randomLinkString = generateRandomString(10);
 
 		const firebaseData: jsonURLFormat = {
 
 			long_url: data.long_url,
 
-			post_date: new Date().toDateString(),
+			post_date: new Date().toISOString(),
 
 		};
 
@@ -124,13 +124,11 @@ async function handler(req: Request): Promise<Response> {
 
 		} catch(_err) {
 
-			return createJsonResponse({ "error": "Failed to fetch data from database. Please try again later." }, 500);
+			return createJsonResponse({ "error": "Failed to POST data to the database. Please try again later." }, 500);
 
 		}
 
-		let firebaseResponse: string = "Link hasn't been generated due to an internal server error.";
-
-		if (result && (result.long_url === firebaseData.long_url) && (result.post_date === firebaseData.post_date)) firebaseResponse = `${url.origin}/url/${randomLinkString}`;
+		const firebaseResponse: string = (result && result.long_url === firebaseData.long_url && result.post_date === firebaseData.post_date) ? `${url.origin}/url/${randomLinkString}` : "Link could not be generated due to an internal server error.";
 
 		return createJsonResponse({ link: firebaseResponse }, 201);
 	

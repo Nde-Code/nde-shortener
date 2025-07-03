@@ -10,6 +10,8 @@ export interface Config {
 
     FIREBASE_TIMEOUT: number;
 
+    FIREBASE_ENTRIES_LIMIT: number;
+
 }
 
 export interface jsonURLFormat {

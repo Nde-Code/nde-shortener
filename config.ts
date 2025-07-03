@@ -10,6 +10,8 @@ export const config: Config = {
 
     FIREBASE_HIDDEN_PATH: Deno.env.get("FIREBASE_HIDDEN_PATH") ?? "",
 
-    FIREBASE_TIMEOUT: 5000
+    FIREBASE_TIMEOUT: 5000,
+
+    FIREBASE_ENTRIES_LIMIT: 250
 
 };
