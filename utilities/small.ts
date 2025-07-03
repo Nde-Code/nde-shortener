@@ -86,9 +86,7 @@ export async function parseJsonBody<T = unknown>(req: Request): Promise<T | null
 
         return JSON.parse(bodyText) as T;
 
-    } catch (err) {
-
-        console.error("Failed to parse JSON body:", err);
+    } catch (_err) {
 
         return null;
 

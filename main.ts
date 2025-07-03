@@ -16,6 +16,12 @@ async function handler(req: Request): Promise<Response> {
 
 	const pathname: string = url.pathname;
 
+	if (!checkGlobalRateLimit()) return createJsonResponse({ "error": "Rate limit exceeded: only 1 request per second allowed globally." }, 429);
+
+	if (!config.FIREBASE_URL) return createJsonResponse({ "error": "Your Firebase host link is missing. Please check your .env file !" }, 500);
+
+	if (!config.FIREBASE_HIDDEN_PATH) return createJsonResponse({ "error": "The secret path for your database is missing. Please check your .env file." }, 500);
+
 	if (req.method === "OPTIONS") {
 
 		return new Response(null, {
@@ -38,27 +44,11 @@ async function handler(req: Request): Promise<Response> {
 
 	}
 
-	if (!checkGlobalRateLimit()) return createJsonResponse({ "error": "Rate limit exceeded: only 1 request per second allowed globally." }, 429, config.ORIGIN_ERROR);
-
-	if (!config.FIREBASE_URL) return createJsonResponse({ "error": "Your Firebase host link is missing. Please check your .env file !" }, 500, config.ORIGIN_ERROR);
-
-	if (!config.FIREBASE_HIDDEN_PATH) return createJsonResponse({ "error": "The secret path for your database is missing. Please check your .env file." }, 500, config.ORIGIN_ERROR);
-
 	if (req.method === "GET" && pathname === "/urls") {
 
-		let data: jsonURLFormat | null = null;
+		const data: jsonURLFormat | null = await readInFirebaseRTDB<jsonURLFormat>(config.FIREBASE_URL, config.FIREBASE_HIDDEN_PATH);;
 
-		try {
-
-			data = await readInFirebaseRTDB<jsonURLFormat>(config.FIREBASE_URL, config.FIREBASE_HIDDEN_PATH);
-
-		} catch(_err) {
-
-			return createJsonResponse({ "error": "Failed to fetch data from database. Please try again later." }, 500, config.ORIGIN_ERROR);
-
-		}
-
-		return createJsonResponse(data ?? {}, 200, config.ORIGIN_FOR_DB_LIST);
+		return createJsonResponse(data ?? {}, 200);
 
 	}
 
@@ -66,21 +56,11 @@ async function handler(req: Request): Promise<Response> {
 
 		const id: string = pathname.split("/")[2];
 
-		let data: jsonURLMap | null = null;
+		const data: jsonURLMap | null = await readInFirebaseRTDB<jsonURLMap>(config.FIREBASE_URL, config.FIREBASE_HIDDEN_PATH);;
 
-		try {
+		if (!id) return createJsonResponse({ "error": "URL ID is missing." }, 400);
 
-			data = await readInFirebaseRTDB<jsonURLMap>(config.FIREBASE_URL, config.FIREBASE_HIDDEN_PATH);
-
-		} catch(_err) {
-
-			return createJsonResponse({ "error": "Failed to fetch data from database. Please try again later." }, 500, config.ORIGIN_ERROR);
-
-		}
-
-		if (!id) return createJsonResponse({ "error": "URL ID is missing." }, 400, config.ORIGIN_ERROR);
-
-		if (data && Object.prototype.hasOwnProperty.call(data, id)) {
+		else if (data && Object.prototype.hasOwnProperty.call(data, id)) {
 
 			return new Response(null, {
 
@@ -94,9 +74,11 @@ async function handler(req: Request): Promise<Response> {
 
 			});
 
-		} else {
+		}
+		
+		else {
 
-			return createJsonResponse({ "error": "This link was not found in the database. Sorry !" }, 404, config.ORIGIN_ERROR);
+			return createJsonResponse({ "error": "This link was not found in the database. Sorry !" }, 404);
 
 		}
 
@@ -104,41 +86,21 @@ async function handler(req: Request): Promise<Response> {
 
   	if (req.method === "POST" && pathname === "/post-url") {
 
-		let data: postBODYType | null = null;
+		const data: postBODYType | null = await parseJsonBody<postBODYType>(req);
 
-		try {
+		if (!data) return createJsonResponse({ "error": "The body of the POST request is not valid. Please refer to the documentation before sending the request." }, 400);
 
-			data = await parseJsonBody<postBODYType>(req);
+		if (!data.long_url) return createJsonResponse({ "error": "The field 'long_url' is required but missing." }, 400);
 
-		} catch(_err) {
+		if (!isValidUrl(data.long_url)) return createJsonResponse({ "error": "The provided long_url is not in a valid URL format." }, 400);
 
-			return createJsonResponse({ "error": "Failed to fetch data from database. Please try again later." }, 500, config.ORIGIN_ERROR);
-
-		}
-
-		if (!data) return createJsonResponse({ "error": "The body of the POST request is not valid. Please refer to the documentation before sending the request." }, 400, config.ORIGIN_ERROR);
-
-		if (!data.long_url) return createJsonResponse({ "error": "The field 'long_url' is required but missing." }, 400, config.ORIGIN_ERROR);
-
-		if (!isValidUrl(data.long_url)) return createJsonResponse({ "error": "The provided long_url is not in a valid URL format." }, 400, config.ORIGIN_ERROR);
-
-		let completeDB: JsonURLMapOfFullDB | null = null;
-
-		try {
-
-			completeDB = await readInFirebaseRTDB<JsonURLMapOfFullDB>(config.FIREBASE_URL, config.FIREBASE_HIDDEN_PATH);
-
-		} catch(_err) {
-
-			return createJsonResponse({ "error": "Failed to fetch data from database. Please try again later." }, 500, config.ORIGIN_ERROR);
-
-		}
+		const completeDB: JsonURLMapOfFullDB | null = await readInFirebaseRTDB<JsonURLMapOfFullDB>(config.FIREBASE_URL, config.FIREBASE_HIDDEN_PATH);
 
 		if (completeDB && Object.keys(completeDB).length > 0) {
 
 			const foundKey = findUrlKey(completeDB, data.long_url);
 
-			if (foundKey !== null) return createJsonResponse({ "error": "The URL is already in the database", link: `${url.origin}/url/${foundKey}` }, 409, config.ORIGIN_ERROR);
+			if (foundKey !== null) return createJsonResponse({ "error": "The URL is already in the database", link: `${url.origin}/url/${foundKey}` }, 409);
 		
 		}
 
@@ -162,7 +124,7 @@ async function handler(req: Request): Promise<Response> {
 
 		} catch(_err) {
 
-			return createJsonResponse({ "error": "Failed to fetch data from database. Please try again later." }, 500, config.ORIGIN_ERROR);
+			return createJsonResponse({ "error": "Failed to fetch data from database. Please try again later." }, 500);
 
 		}
 
@@ -170,11 +132,11 @@ async function handler(req: Request): Promise<Response> {
 
 		if (result && (result.long_url === firebaseData.long_url) && (result.post_date === firebaseData.post_date)) firebaseResponse = `${url.origin}/url/${randomLinkString}`;
 
-		return createJsonResponse({ link: firebaseResponse }, 201, config.ORIGIN_FOR_POST);
+		return createJsonResponse({ link: firebaseResponse }, 201);
 	
 	}
 
-	return createJsonResponse({ "error": "The requested endpoint is invalid." }, 404, config.ORIGIN_ERROR);
+	return createJsonResponse({ "error": "The requested endpoint is invalid." }, 404);
 
 }
 
