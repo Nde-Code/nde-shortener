@@ -1,7 +1,5 @@
 import { JsonURLMapOfFullDB  } from "../types/types.ts";
 
-import { config } from '../config.ts'
-
 export function findUrlKey(data: JsonURLMapOfFullDB, urlToCheck: string): string | null {
 
     if (!data || Object.keys(data).length === 0) return null;
@@ -20,26 +18,16 @@ export function isValidUrl(url: string): boolean {
 
     try {
 
-        const parsed: URL = new URL(url);
+        const { protocol, hostname } = new URL(url);
 
-        if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return false;
-
-        if (parsed.hostname.endsWith(".")) return false;
-
-        if (!parsed.hostname.includes(".")) return false;
-
-        if (parsed.hostname.split('.').some(label => label.length === 0)) return false;
-
-        if (["localhost", "127.0.0.1", "::1"].includes(parsed.hostname)) return false;
-
-        return true;
-
+        return ((protocol === "http:" || protocol === "https:") && !hostname.endsWith(".") && hostname.includes(".") && !hostname.split(".").some((label) => label.length === 0) && !["localhost", "127.0.0.1", "::1"].includes(hostname));
+    
     } catch {
 
         return false;
 
     }
-
+    
 }
 
 export function generateRandomString(length: number): string {
@@ -57,18 +45,6 @@ export function generateRandomString(length: number): string {
     }
 
     return result;
-
-}
-
-export function checkGlobalRateLimit(): boolean {
-
-    const now: number = Date.now();
-
-    if (now - config.LAST_REQUEST_TIMESTAMP < config.RATE_LIMIT_INTERVAL_MS) return false;
-
-    config.LAST_REQUEST_TIMESTAMP = now;
-
-    return true; 
 
 }
 

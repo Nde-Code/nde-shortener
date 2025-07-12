@@ -1,12 +1,10 @@
 export interface Config {
 
-    LAST_REQUEST_TIMESTAMP: number;
-
-    RATE_LIMIT_INTERVAL_MS: number;
-
     FIREBASE_URL: string;
 
     FIREBASE_HIDDEN_PATH: string;
+    
+    RATE_LIMIT_INTERVAL_MS: number;
 
     FIREBASE_TIMEOUT: number;
 

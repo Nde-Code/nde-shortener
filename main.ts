@@ -4,7 +4,9 @@ import { readInFirebaseRTDB } from "./utilities/read.ts";
 
 import { jsonURLFormat, JsonURLMapOfFullDB, postBODYType } from "./types/types.ts";
 
-import { parseJsonBody, checkGlobalRateLimit, findUrlKey, isValidUrl, generateRandomString } from "./utilities/small.ts";
+import { parseJsonBody, findUrlKey, isValidUrl, generateRandomString } from "./utilities/utils.ts";
+
+import { getIp, hashIp, checkGlobalRateLimit } from "./utilities/rate.ts";
 
 import { createJsonResponse } from "./utilities/http_response.ts";
 
@@ -16,7 +18,9 @@ async function handler(req: Request): Promise<Response> {
 
 	const pathname: string = url.pathname;
 
-	if (!checkGlobalRateLimit()) return createJsonResponse({ "error": "Rate limit exceeded: only 1 request per second allowed globally." }, 429);
+	const hashedIP: string = await hashIp(getIp(req));
+
+	if (!checkGlobalRateLimit(hashedIP)) return createJsonResponse({ "error": "Rate limit exceeded: only 1 request every 5 seconds." }, 429);
 
 	if (!config.FIREBASE_URL || !config.FIREBASE_HIDDEN_PATH) return createJsonResponse({ "error": "Your Firebase credentials are missing. Please check your .env file." }, 500);
 
