@@ -22,12 +22,6 @@ export interface jsonURLFormat {
 
 }
 
-export interface jsonURLMap {
-
-  	[id: string]: jsonURLFormat;
-
-}
-
 export type postBODYType = { long_url: string };
 
 export type JsonURLMapOfFullDB = Record<string, { long_url: string; post_date: string }>;

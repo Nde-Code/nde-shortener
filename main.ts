@@ -2,7 +2,7 @@ import { postInFirebaseRTDB } from "./utilities/post.ts";
 
 import { readInFirebaseRTDB } from "./utilities/read.ts";
 
-import { jsonURLFormat, jsonURLMap, JsonURLMapOfFullDB, postBODYType } from "./types/types.ts";
+import { jsonURLFormat, JsonURLMapOfFullDB, postBODYType } from "./types/types.ts";
 
 import { parseJsonBody, checkGlobalRateLimit, findUrlKey, isValidUrl, generateRandomString } from "./utilities/small.ts";
 
@@ -20,33 +20,15 @@ async function handler(req: Request): Promise<Response> {
 
 	if (!config.FIREBASE_URL || !config.FIREBASE_HIDDEN_PATH) return createJsonResponse({ "error": "Your Firebase credentials are missing. Please check your .env file." }, 500);
 
-	if (req.method === "OPTIONS") {
-
-		return new Response(null, {
-
-			status: 204,
-
-			headers: {
-
-				"Access-Control-Allow-Origin": "*",
-
-				"Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-
-				"Access-Control-Allow-Headers": "Content-Type",
-
-				"Access-Control-Max-Age": "86400",
-				
-			},
-
-		});
-
-	}
+	if (req.method === "OPTIONS") createJsonResponse({"error": "CORS is disabled for this API, sorry..."}, 204)
 
 	if (req.method === "GET" && pathname === "/urls") {
 
 		const data: jsonURLFormat | null = await readInFirebaseRTDB<jsonURLFormat>(config.FIREBASE_URL, config.FIREBASE_HIDDEN_PATH);
 
-		return createJsonResponse(data ?? {}, 200);
+		if (data && data !== null) return createJsonResponse(data ?? {}, 200);
+
+		else return createJsonResponse({"error": "Sorry no url(s) to retreive from the database."}, 204);
 
 	}
 
@@ -54,11 +36,11 @@ async function handler(req: Request): Promise<Response> {
 
 		const id: string = pathname.split("/")[2];
 
-		if (!id) return createJsonResponse({ "error": "URL ID is missing." }, 400);
+		if (!id) return createJsonResponse({ "error": "URL ID is missing." }, 200);
 
-		const data: jsonURLMap | null = await readInFirebaseRTDB<jsonURLMap>(config.FIREBASE_URL, config.FIREBASE_HIDDEN_PATH);
+		const data: jsonURLFormat | null = await readInFirebaseRTDB<jsonURLFormat>(config.FIREBASE_URL, `${config.FIREBASE_HIDDEN_PATH}/${id}`);
 
-		if (data && Object.prototype.hasOwnProperty.call(data, id)) {
+		if (data && data !== null) {
 
 			return new Response(null, {
 
@@ -66,7 +48,7 @@ async function handler(req: Request): Promise<Response> {
 
 				headers: {
 
-					Location: data[id].long_url.toString()
+					Location: data.long_url.toString()
 
 				},
 
@@ -74,12 +56,8 @@ async function handler(req: Request): Promise<Response> {
 
 		}
 		
-		else {
-
-			return createJsonResponse({ "error": "This link was not found in the database. Sorry !" }, 404);
-
-		}
-
+		else return createJsonResponse({ "error": "This link was not found in the database. Sorry !" }, 404);
+	
 	}
 
   	if (req.method === "POST" && pathname === "/post-url") {
