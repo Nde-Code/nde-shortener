@@ -58,7 +58,7 @@ export function checkDailyRateLimit(hashedIp: string): boolean {
 
 }
 
-export async function hashIp(ip: string, salt = "monSecret"): Promise<string> {
+export async function hashIp(ip: string, salt = config.HASH_KEY): Promise<string> {
 
     const encoder: TextEncoder = new TextEncoder();
 

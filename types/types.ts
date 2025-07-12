@@ -3,6 +3,8 @@ export interface Config {
     FIREBASE_URL: string;
 
     FIREBASE_HIDDEN_PATH: string;
+
+    HASH_KEY: string;
     
     RATE_LIMIT_INTERVAL_MS: number;
 
