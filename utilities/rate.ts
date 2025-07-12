@@ -1,10 +1,16 @@
-import { config } from '../config.ts'
+import { config } from '../config.ts';
 
-const ipTimestamps: Map<string, number> = new Map<string, number>();
+const ipTimestamps = new Map<string, number>();
 
-export function getIp(req: Request): string { return (req.headers.get("x-forwarded-for") || req.headers.get("forwarded") || "unknown"); }
+const ipDailyCounters = new Map<string, { date: string; count: number }>();
 
-export function checkGlobalRateLimit(hashedIp: string): boolean {
+export function getIp(req: Request): string {
+
+    return (req.headers.get("x-forwarded-for") || req.headers.get("forwarded") || "unknown");
+
+}
+
+export function checkTimeRateLimit(hashedIp: string): boolean {
 
     const now: number = Date.now();
 
@@ -15,7 +21,39 @@ export function checkGlobalRateLimit(hashedIp: string): boolean {
     }
 
     ipTimestamps.set(hashedIp, now);
-    
+
+    return true;
+
+}
+
+export function checkDailyRateLimit(hashedIp: string): boolean {
+
+    const today: string = new Date().toISOString().slice(0, 10); 
+
+    const record: { date: string; count: number; } | undefined = ipDailyCounters.get(hashedIp);
+
+    if (!record) {
+
+        ipDailyCounters.set(hashedIp, { date: today, count: 1 });
+
+        return true;
+
+    }
+
+    if (record.date !== today) {
+
+        ipDailyCounters.set(hashedIp, { date: today, count: 1 });
+
+        return true;
+
+    }
+
+    if (record.count >= config.DAILY_LIMIT) return false;
+
+    record.count += 1;
+
+    ipDailyCounters.set(hashedIp, record);
+
     return true;
 
 }

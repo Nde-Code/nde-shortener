@@ -6,7 +6,7 @@ import { jsonURLFormat, JsonURLMapOfFullDB, postBODYType } from "./types/types.t
 
 import { parseJsonBody, findUrlKey, isValidUrl, generateRandomString } from "./utilities/utils.ts";
 
-import { getIp, hashIp, checkGlobalRateLimit } from "./utilities/rate.ts";
+import { getIp, hashIp, checkTimeRateLimit, checkDailyRateLimit } from "./utilities/rate.ts";
 
 import { createJsonResponse } from "./utilities/http_response.ts";
 
@@ -20,9 +20,11 @@ async function handler(req: Request): Promise<Response> {
 
 	const hashedIP: string = await hashIp(getIp(req));
 
-	if (!checkGlobalRateLimit(hashedIP)) return createJsonResponse({ "error": "Rate limit exceeded: only 1 request every 5 seconds." }, 429);
-
 	if (!config.FIREBASE_URL || !config.FIREBASE_HIDDEN_PATH) return createJsonResponse({ "error": "Your Firebase credentials are missing. Please check your .env file." }, 500);
+	
+	if (!checkTimeRateLimit(hashedIP)) return createJsonResponse({ "warning": "Rate limit exceeded: only 1 request every 5 seconds." }, 429);
+
+	if (!checkDailyRateLimit(hashedIP)) return createJsonResponse({ "warning": "Rate limit exceeded: maximum of 10 requests allowed per day." }, 429);
 
 	if (req.method === "OPTIONS") createJsonResponse({"error": "CORS is disabled for this API, sorry..."}, 204)
 

@@ -8,6 +8,8 @@ export const config: Config = {
     
     RATE_LIMIT_INTERVAL_MS: 5000,
 
+    DAILY_LIMIT: 10,
+
     FIREBASE_TIMEOUT: 5000,
 
     FIREBASE_ENTRIES_LIMIT: 500

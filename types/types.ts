@@ -6,6 +6,8 @@ export interface Config {
     
     RATE_LIMIT_INTERVAL_MS: number;
 
+    DAILY_LIMIT: number;
+
     FIREBASE_TIMEOUT: number;
 
     FIREBASE_ENTRIES_LIMIT: number;
