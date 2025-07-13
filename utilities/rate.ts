@@ -4,6 +4,47 @@ const ipTimestamps = new Map<string, number>();
 
 const ipDailyCounters = new Map<string, { date: string; count: number }>();
 
+function purgeOldDailyCounters() {
+
+    const today = new Date().toISOString().slice(0, 10);
+
+    for (const [hashedIp, record] of ipDailyCounters.entries()) {
+
+        if (record.date !== today) ipDailyCounters.delete(hashedIp);
+
+    }
+}
+
+function purgeOldIpTimestamps() {
+
+    const now = Date.now();
+
+    for (const [hashedIp, timestamp] of ipTimestamps.entries()) {
+
+        if ((now - timestamp) > config.RATE_LIMIT_INTERVAL_MS) ipTimestamps.delete(hashedIp);
+
+    }
+
+}
+
+function scheduleDailyPurge() {
+
+    const now = new Date();
+
+    const nextMidnight = new Date(now.getFullYear(), now.getMonth(), (now.getDate() + 1), 0, 0, 0, 0);
+
+    const msUntilMidnight = nextMidnight.getTime() - now.getTime();
+
+    setTimeout(() => {
+
+        purgeOldDailyCounters();
+
+        scheduleDailyPurge();
+        
+    }, msUntilMidnight);
+    
+}
+
 export function getIp(req: Request): string {
 
     return (req.headers.get("x-forwarded-for") || req.headers.get("forwarded") || "unknown");
@@ -69,3 +110,7 @@ export async function hashIp(ip: string, salt = config.HASH_KEY): Promise<string
     return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, "0")).join("");
 
 }
+
+setInterval(() => { purgeOldIpTimestamps(); }, 60 * 60 * 1000); 
+
+scheduleDailyPurge();
