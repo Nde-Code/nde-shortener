@@ -8,7 +8,7 @@ export const config: Config = {
 
     HASH_KEY: Deno.env.get("HASH_KEY") ?? "",
     
-    RATE_LIMIT_INTERVAL_MS: 5000,
+    RATE_LIMIT_INTERVAL_MS: 1000,
 
     DAILY_LIMIT: 10,
 

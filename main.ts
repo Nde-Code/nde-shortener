@@ -22,7 +22,7 @@ async function handler(req: Request): Promise<Response> {
 
 	if (!config.FIREBASE_URL || !config.FIREBASE_HIDDEN_PATH) return createJsonResponse({ "error": "Your Firebase credentials are missing. Please check your .env file." }, 500);
 	
-	if (!checkTimeRateLimit(hashedIP)) return createJsonResponse({ "warning": "Rate limit exceeded: only 1 request every 5 seconds." }, 429);
+	if (!checkTimeRateLimit(hashedIP)) return createJsonResponse({ "warning": "Rate limit exceeded: only 1 request per second is allowed." }, 429);
 
 	if (!checkDailyRateLimit(hashedIP)) return createJsonResponse({ "warning": "Rate limit exceeded: maximum of 10 requests allowed per day." }, 429);
 
@@ -100,19 +100,9 @@ async function handler(req: Request): Promise<Response> {
 
 		const path: string = `/${config.FIREBASE_HIDDEN_PATH}/${randomLinkString}`;
 
-		let result: jsonURLFormat | null = null;
+		const result: jsonURLFormat | null = await postInFirebaseRTDB<jsonURLFormat, jsonURLFormat>(config.FIREBASE_URL, path, firebaseData);
 
-		try {
-
-			result = await postInFirebaseRTDB<jsonURLFormat, jsonURLFormat>(config.FIREBASE_URL, path, firebaseData);
-
-		} catch(_err) {
-
-			return createJsonResponse({ "error": "Failed to POST data to the database. Please try again later." }, 500);
-
-		}
-
-		const firebaseResponse: string = (result && result.long_url === firebaseData.long_url && result.post_date === firebaseData.post_date) ? `${url.origin}/url/${randomLinkString}` : "Link could not be generated due to an internal server error.";
+		const firebaseResponse: string = (result !== null && result.long_url === firebaseData.long_url && result.post_date === firebaseData.post_date) ? `${url.origin}/url/${randomLinkString}` : "Link could not be generated due to an internal server error.";
 
 		return createJsonResponse({ link: firebaseResponse }, 201);
 	

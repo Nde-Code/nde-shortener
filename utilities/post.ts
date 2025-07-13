@@ -1,6 +1,6 @@
 import { config } from "../config.ts";
 
-export async function postInFirebaseRTDB<T, U>(FIREBASE_URL: string, path: string, data: U): Promise<T> {
+export async function postInFirebaseRTDB<T = unknown, U = unknown>(FIREBASE_URL: string, path: string, data: U): Promise<T | null> {
 
     const url: string = `${FIREBASE_URL}${path}.json`;
 
@@ -24,7 +24,7 @@ export async function postInFirebaseRTDB<T, U>(FIREBASE_URL: string, path: strin
 
     clearTimeout(timeoutId);
 
-    if (!res.ok) throw new Error(`Firebase error (${res.status}) !`);
+    if (!res.ok) return null;
 
     return (await res.json()) as T;
 
