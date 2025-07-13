@@ -26,7 +26,25 @@ async function handler(req: Request): Promise<Response> {
 
 	if (!checkDailyRateLimit(hashedIP)) return createJsonResponse({ "warning": "Rate limit exceeded: maximum of 10 requests allowed per day." }, 429);
 
-	if (req.method === "OPTIONS") createJsonResponse({"error": "CORS is disabled for this API, sorry..."}, 204)
+	if (req.method === "OPTIONS") {
+
+		return createJsonResponse({},
+		
+			204,
+
+			{
+
+				"Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+
+				"Access-Control-Allow-Headers": "Content-Type, Authorization",
+
+				"Access-Control-Max-Age": "86400",
+
+			}
+		
+		);
+		
+  	}
 
 	if (req.method === "GET" && pathname === "/urls") {
 
