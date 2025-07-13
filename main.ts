@@ -20,7 +20,7 @@ async function handler(req: Request): Promise<Response> {
 
 	const hashedIP: string = await hashIp(getIp(req));
 
-	if (!config.FIREBASE_URL || !config.FIREBASE_HIDDEN_PATH) return createJsonResponse({ "error": "Your Firebase credentials are missing. Please check your .env file." }, 500);
+	if (!config.FIREBASE_URL || !config.FIREBASE_HIDDEN_PATH || !config.HASH_KEY) return createJsonResponse({ "error": "Your credentials are missing. Please check your .env file." }, 500);
 	
 	if (!checkTimeRateLimit(hashedIP)) return createJsonResponse({ "warning": "Rate limit exceeded: only 1 request per second is allowed." }, 429);
 
