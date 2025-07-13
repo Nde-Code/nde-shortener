@@ -24,8 +24,6 @@ async function handler(req: Request): Promise<Response> {
 	
 	if (!checkTimeRateLimit(hashedIP)) return createJsonResponse({ "warning": "Rate limit exceeded: only 1 request per second is allowed." }, 429);
 
-	if (!checkDailyRateLimit(hashedIP)) return createJsonResponse({ "warning": "Rate limit exceeded: maximum of 10 requests allowed per day." }, 429);
-
 	if (req.method === "OPTIONS") {
 
 		return createJsonResponse({},
@@ -85,6 +83,8 @@ async function handler(req: Request): Promise<Response> {
 	}
 
   	if (req.method === "POST" && pathname === "/post-url") {
+
+		if (!checkDailyRateLimit(hashedIP)) return createJsonResponse({ "warning": "Rate limit exceeded: maximum of 10 write requests allowed per day." }, 429);
 
 		const data: postBODYType | null = await parseJsonBody<postBODYType>(req);
 
