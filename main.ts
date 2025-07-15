@@ -2,9 +2,11 @@ import { postInFirebaseRTDB } from "./utilities/post.ts";
 
 import { readInFirebaseRTDB } from "./utilities/read.ts";
 
+import { deleteInFirebaseRTDB } from "./utilities/delete.ts";
+
 import { jsonURLFormat, JsonURLMapOfFullDB, postBODYType } from "./types/types.ts";
 
-import { parseJsonBody, findUrlKey, isValidUrl, generateRandomString } from "./utilities/utils.ts";
+import { parseJsonBody, findUrlKey, isValidUrl, generateRandomString, hasAnID } from "./utilities/utils.ts";
 
 import { getIp, hashIp, checkTimeRateLimit, checkDailyRateLimit } from "./utilities/rate.ts";
 
@@ -54,13 +56,31 @@ async function handler(req: Request): Promise<Response> {
 
 	}
 
+	if (req.method === "GET" && pathname.startsWith("/delete/")) {
+
+		const ID = hasAnID(pathname);
+		
+		const apiKey = url.searchParams.get("apiKey");
+
+		if (apiKey !== config.ADMIN_KEY) return createJsonResponse({"error": "The API key provided for link deletion is incorrect."}, 401);
+
+		else {
+
+			const data: boolean  = await deleteInFirebaseRTDB(config.FIREBASE_URL, `${config.FIREBASE_HIDDEN_PATH}/${ID}`);
+
+			if (data === true) return createJsonResponse({ "success": "The link has been deleted correctly." }, 200)
+			
+			else return createJsonResponse({ "error": "This link was not found in the database. Sorry !" }, 404);
+
+		}
+	
+	}
+
 	if (req.method === "GET" && pathname.startsWith("/url/")) {
 
-		const id: string = pathname.split("/")[2];
+		const ID = hasAnID(pathname);
 
-		if (!id) return createJsonResponse({ "error": "URL ID is missing." }, 200);
-
-		const data: jsonURLFormat | null = await readInFirebaseRTDB<jsonURLFormat>(config.FIREBASE_URL, `${config.FIREBASE_HIDDEN_PATH}/${id}`);
+		const data: jsonURLFormat | null = await readInFirebaseRTDB<jsonURLFormat>(config.FIREBASE_URL, `${config.FIREBASE_HIDDEN_PATH}/${ID}`);
 
 		if (data && data !== null) {
 
