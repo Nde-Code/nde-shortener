@@ -110,6 +110,10 @@ async function handler(req: Request): Promise<Response> {
 
 		if (!data.long_url) return createJsonResponse({ "error": "The field 'long_url' is required but missing." }, 400);
 
+		const keys = Object.keys(data as object);
+
+  		if (keys.length !== 1 || keys[0] !== "long_url") return createJsonResponse({ "error": "The body contains unexpected field." }, 400);
+
 		if (!isValidUrl(data.long_url)) return createJsonResponse({ "error": "The provided long_url is not in a valid URL format." }, 400);
 
 		const completeDB: JsonURLMapOfFullDB | null = await readInFirebaseRTDB<JsonURLMapOfFullDB>(config.FIREBASE_URL, config.FIREBASE_HIDDEN_PATH);
