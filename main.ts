@@ -104,8 +104,6 @@ async function handler(req: Request): Promise<Response> {
 
   	if (req.method === "POST" && pathname === "/post-url") {
 
-		if (!checkDailyRateLimit(hashedIP)) return createJsonResponse({ "warning": "Rate limit exceeded: maximum of 10 write requests allowed per day." }, 429);
-
 		const data: postBODYType | null = await parseJsonBody<postBODYType>(req);
 
 		if (!data) return createJsonResponse({ "error": "The body of the POST request is not valid. Please refer to the documentation before sending the request." }, 400);
@@ -126,24 +124,30 @@ async function handler(req: Request): Promise<Response> {
 
 		if (completeDB && Object.keys(completeDB).length > config.FIREBASE_ENTRIES_LIMIT) return createJsonResponse({ "error": "The database has reached the limit of entries." }, 507);
 
-		const randomLinkString = generateRandomString(10);
+		if (!checkDailyRateLimit(hashedIP)) return createJsonResponse({ "warning": "Rate limit exceeded: maximum of 10 write requests allowed per day." }, 429);
 
-		const firebaseData: jsonURLFormat = {
+		else {
+			
+			const randomLinkString = generateRandomString(10);
 
-			long_url: data.long_url,
+			const firebaseData: jsonURLFormat = {
 
-			post_date: new Date().toISOString(),
+				long_url: data.long_url,
 
-		};
+				post_date: new Date().toISOString(),
 
-		const path: string = `/${config.FIREBASE_HIDDEN_PATH}/${randomLinkString}`;
+			};
 
-		const result: jsonURLFormat | null = await postInFirebaseRTDB<jsonURLFormat, jsonURLFormat>(config.FIREBASE_URL, path, firebaseData);
+			const path: string = `/${config.FIREBASE_HIDDEN_PATH}/${randomLinkString}`;
 
-		const firebaseResponse: string = (result !== null && result.long_url === firebaseData.long_url && result.post_date === firebaseData.post_date) ? `${url.origin}/url/${randomLinkString}` : "Link could not be generated due to an internal server error.";
+			const result: jsonURLFormat | null = await postInFirebaseRTDB<jsonURLFormat, jsonURLFormat>(config.FIREBASE_URL, path, firebaseData);
 
-		return createJsonResponse({ link: firebaseResponse }, 201);
-	
+			const firebaseResponse: string = (result !== null && result.long_url === firebaseData.long_url && result.post_date === firebaseData.post_date) ? `${url.origin}/url/${randomLinkString}` : "Link could not be generated due to an internal server error.";
+
+			return createJsonResponse({ link: firebaseResponse }, 201);
+
+		}
+
 	}
 
 	return createJsonResponse({ "error": "The requested endpoint is invalid." }, 404);
