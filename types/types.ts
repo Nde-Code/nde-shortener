@@ -24,8 +24,10 @@ export interface jsonURLFormat {
 
 	post_date: string
 
+    is_verified: boolean
+
 }
 
 export type postBODYType = { long_url: string };
 
-export type JsonURLMapOfFullDB = Record<string, { long_url: string; post_date: string }>;
+export type jsonURLMapOfFullDB = Record<string, { long_url: string; post_date: string, is_verified: boolean }>;

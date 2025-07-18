@@ -1,8 +1,8 @@
-import { JsonURLMapOfFullDB  } from "../types/types.ts";
+import { jsonURLMapOfFullDB  } from "../types/types.ts";
 
 import { createJsonResponse } from "./http_response.ts";
 
-export function findUrlKey(data: JsonURLMapOfFullDB, urlToCheck: string): string | null {
+export function findUrlKey(data: jsonURLMapOfFullDB, urlToCheck: string): string | null {
 
     if (!data || Object.keys(data).length === 0) return null;
   
@@ -16,11 +16,13 @@ export function findUrlKey(data: JsonURLMapOfFullDB, urlToCheck: string): string
 
 }
 
-export function hasAnID(path: string): string | Response {
+export function extractValidID(path: string): string | Response {
 
     const id: string = path.split("/")[2];
     
-    if (!id) return createJsonResponse({ "error": "URL ID is missing." }, 200);
+    if (!id) return createJsonResponse({ "error": "URL ID is missing." }, 400);
+
+    else if (!/^[a-zA-Z0-9_-]{5,}$/.test(id)) return createJsonResponse({ error: "Invalid ID format." }, 400);
 
     else return id;
 

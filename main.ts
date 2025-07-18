@@ -4,9 +4,11 @@ import { readInFirebaseRTDB } from "./utilities/read.ts";
 
 import { deleteInFirebaseRTDB } from "./utilities/delete.ts";
 
-import { jsonURLFormat, JsonURLMapOfFullDB, postBODYType } from "./types/types.ts";
+import { setIsVerifiedTrue, VerificationStatus } from "./utilities/verify.ts";
 
-import { parseJsonBody, findUrlKey, isValidUrl, generateRandomString, hasAnID } from "./utilities/utils.ts";
+import { jsonURLFormat, jsonURLMapOfFullDB, postBODYType } from "./types/types.ts";
+
+import { parseJsonBody, findUrlKey, isValidUrl, generateRandomString, extractValidID } from "./utilities/utils.ts";
 
 import { getIp, hashIp, checkTimeRateLimit, checkDailyRateLimit } from "./utilities/rate.ts";
 
@@ -56,11 +58,31 @@ async function handler(req: Request): Promise<Response> {
 
 	}
 
-	if (req.method === "GET" && pathname.startsWith("/delete/")) {
+	if (req.method === "GET" && pathname.startsWith("/verify/")) {
 
-		const ID = hasAnID(pathname);
+		const ID: string | Response = extractValidID(pathname);
+
+		const apiKey: string | null = url.searchParams.get("apiKey");
+
+		if (apiKey !== config.ADMIN_KEY) return createJsonResponse({ "error": "The API key provided for link verification is incorrect or missing." }, 401);
+
+		const result: VerificationStatus = await setIsVerifiedTrue(config.FIREBASE_URL, `${config.FIREBASE_HIDDEN_PATH}/${ID}`);
+
+		if (result === "verified_now") return createJsonResponse({ "success": "The link has been verified successfully." }, 200);	
+
+		else if (result === "already_verified") return createJsonResponse({ "warning": "This link was already verified." }, 200);
+
+		else if (result === "not_found") return createJsonResponse({ "error": "This link was not found in the database." }, 404);
+
+		else return createJsonResponse({ "error": "Something went wrong during verification." }, 500);
+
+	}
+
+	if (req.method === "DELETE" && pathname.startsWith("/delete/")) {
+
+		const ID: string | Response = extractValidID(pathname);
 		
-		const apiKey = url.searchParams.get("apiKey");
+		const apiKey: string | null = url.searchParams.get("apiKey");
 
 		if (apiKey !== config.ADMIN_KEY) return createJsonResponse({"error": "The API key provided for link deletion is incorrect."}, 401);
 
@@ -78,7 +100,7 @@ async function handler(req: Request): Promise<Response> {
 
 	if (req.method === "GET" && pathname.startsWith("/url/")) {
 
-		const ID = hasAnID(pathname);
+		const ID: string | Response = extractValidID(pathname);
 
 		const data: jsonURLFormat | null = await readInFirebaseRTDB<jsonURLFormat>(config.FIREBASE_URL, `${config.FIREBASE_HIDDEN_PATH}/${ID}`);
 
@@ -116,7 +138,7 @@ async function handler(req: Request): Promise<Response> {
 
 		if (!isValidUrl(data.long_url)) return createJsonResponse({ "error": "The provided long_url is not in a valid URL format." }, 400);
 
-		const completeDB: JsonURLMapOfFullDB | null = await readInFirebaseRTDB<JsonURLMapOfFullDB>(config.FIREBASE_URL, config.FIREBASE_HIDDEN_PATH);
+		const completeDB: jsonURLMapOfFullDB | null = await readInFirebaseRTDB<jsonURLMapOfFullDB>(config.FIREBASE_URL, config.FIREBASE_HIDDEN_PATH);
 
 		if (completeDB && Object.keys(completeDB).length > 0) {
 
@@ -132,13 +154,15 @@ async function handler(req: Request): Promise<Response> {
 
 		else {
 			
-			const randomLinkString = generateRandomString(10);
+			const randomLinkString: string = generateRandomString(10);
 
 			const firebaseData: jsonURLFormat = {
 
 				long_url: data.long_url,
 
 				post_date: new Date().toISOString(),
+
+				is_verified: false
 
 			};
 
