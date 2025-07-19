@@ -16,6 +16,8 @@ export const config: Config = {
 
     FIREBASE_TIMEOUT: 6000,
 
-    FIREBASE_ENTRIES_LIMIT: 500
+    FIREBASE_ENTRIES_LIMIT: 500,
+
+    SHORT_URL_ID_LENGTH: 14
 
 };

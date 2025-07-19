@@ -8,7 +8,7 @@ import { setIsVerifiedTrue, VerificationStatus } from "./utilities/verify.ts";
 
 import { jsonURLFormat, jsonURLMapOfFullDB, postBODYType } from "./types/types.ts";
 
-import { parseJsonBody, findUrlKey, isValidUrl, generateRandomString, extractValidID } from "./utilities/utils.ts";
+import { parseJsonBody, isValidUrl, extractValidID, sha256 } from "./utilities/utils.ts";
 
 import { getIp, hashIp, checkTimeRateLimit, checkDailyRateLimit } from "./utilities/rate.ts";
 
@@ -52,9 +52,9 @@ async function handler(req: Request): Promise<Response> {
 
 		const data: jsonURLFormat | null = await readInFirebaseRTDB<jsonURLFormat>(config.FIREBASE_URL, config.FIREBASE_HIDDEN_PATH);
 
-		if (data && data !== null) return createJsonResponse(data ?? {}, 200);
+		if (!data) return createJsonResponse({"error": "Sorry no url(s) to retreive from the database."}, 404);
 
-		else return createJsonResponse({"error": "Sorry no url(s) to retreive from the database."}, 204);
+		else return createJsonResponse(data, 200);
 
 	}
 
@@ -108,7 +108,7 @@ async function handler(req: Request): Promise<Response> {
 
 			return new Response(null, {
 
-				status: 302,
+				status: (data.is_verified === true) ? 302 : 301,
 
 				headers: {
 
@@ -128,53 +128,49 @@ async function handler(req: Request): Promise<Response> {
 
 		const data: postBODYType | null = await parseJsonBody<postBODYType>(req);
 
-		if (!data) return createJsonResponse({ "error": "The body of the POST request is not valid. Please refer to the documentation before sending the request." }, 400);
+		if (!data) return createJsonResponse({ error: "The body of the POST request is not valid. Please refer to the documentation before sending the request." }, 400);
 
-		if (!data.long_url) return createJsonResponse({ "error": "The field 'long_url' is required but missing." }, 400);
+		if (!data.long_url) return createJsonResponse({ error: "The field 'long_url' is required but missing." }, 400);
 
 		const keys = Object.keys(data as object);
 
-  		if (keys.length !== 1 || keys[0] !== "long_url") return createJsonResponse({ "error": "The body contains unexpected field." }, 400);
+		if (keys.length !== 1 || keys[0] !== "long_url") return createJsonResponse({ error: "The body contains unexpected field." }, 400);
 
-		if (!isValidUrl(data.long_url)) return createJsonResponse({ "error": "The provided long_url is not in a valid URL format." }, 400);
+		if (!isValidUrl(data.long_url)) return createJsonResponse({ error: "The provided long_url is not in a valid URL format." }, 400);
+
+		const urlKey: string = (await sha256(data.long_url)).slice(0, config.SHORT_URL_ID_LENGTH);
+
+		const existing: jsonURLFormat | null = await readInFirebaseRTDB<jsonURLFormat>(config.FIREBASE_URL, `/${config.FIREBASE_HIDDEN_PATH}/${urlKey}`);
+
+		if (existing) {
+
+			if (existing.long_url === data.long_url) return createJsonResponse({ link: `${url.origin}/url/${urlKey}` }, 200);
+				
+			else return createJsonResponse({ error: "Hash collision detected, please try again." }, 500);
+			
+		}
 
 		const completeDB: jsonURLMapOfFullDB | null = await readInFirebaseRTDB<jsonURLMapOfFullDB>(config.FIREBASE_URL, config.FIREBASE_HIDDEN_PATH);
-
-		if (completeDB && Object.keys(completeDB).length > 0) {
-
-			const foundKey = findUrlKey(completeDB, data.long_url);
-
-			if (foundKey !== null) return createJsonResponse({ "error": "The URL is already in the database", link: `${url.origin}/url/${foundKey}` }, 409);
 		
-		}
+		if (completeDB && Object.keys(completeDB).length > config.FIREBASE_ENTRIES_LIMIT) return createJsonResponse({ error: "The database has reached the limit of entries." }, 507);
 
-		if (completeDB && Object.keys(completeDB).length > config.FIREBASE_ENTRIES_LIMIT) return createJsonResponse({ "error": "The database has reached the limit of entries." }, 507);
+		if (!checkDailyRateLimit(hashedIP)) return createJsonResponse({ warning: "Rate limit exceeded: maximum of 10 write requests allowed per day." }, 429);
 
-		if (!checkDailyRateLimit(hashedIP)) return createJsonResponse({ "warning": "Rate limit exceeded: maximum of 10 write requests allowed per day." }, 429);
+		const firebaseData: jsonURLFormat = {
 
-		else {
-			
-			const randomLinkString: string = generateRandomString(10);
+			long_url: data.long_url,
 
-			const firebaseData: jsonURLFormat = {
+			post_date: new Date().toISOString(),
 
-				long_url: data.long_url,
+			is_verified: false
 
-				post_date: new Date().toISOString(),
+		};
 
-				is_verified: false
+		const result: jsonURLFormat | null = await postInFirebaseRTDB<jsonURLFormat, jsonURLFormat>(config.FIREBASE_URL, `/${config.FIREBASE_HIDDEN_PATH}/${urlKey}`, firebaseData);
 
-			};
+		const firebaseResponse: string = (result !== null && result.long_url === firebaseData.long_url && result.post_date === firebaseData.post_date) ? `${url.origin}/url/${urlKey}` : "Link could not be generated due to an internal server error.";
 
-			const path: string = `/${config.FIREBASE_HIDDEN_PATH}/${randomLinkString}`;
-
-			const result: jsonURLFormat | null = await postInFirebaseRTDB<jsonURLFormat, jsonURLFormat>(config.FIREBASE_URL, path, firebaseData);
-
-			const firebaseResponse: string = (result !== null && result.long_url === firebaseData.long_url && result.post_date === firebaseData.post_date) ? `${url.origin}/url/${randomLinkString}` : "Link could not be generated due to an internal server error.";
-
-			return createJsonResponse({ link: firebaseResponse }, 201);
-
-		}
+		return createJsonResponse({ link: firebaseResponse }, 201);
 
 	}
 
@@ -183,4 +179,3 @@ async function handler(req: Request): Promise<Response> {
 }
 
 Deno.serve(handler);
-// curl -X POST http://localhost:8000/post-url -H "Content-Type: application/json" -d "{\"long_url\":\"https://nde-code.github.io\"}"

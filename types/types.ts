@@ -16,6 +16,8 @@ export interface Config {
 
     FIREBASE_ENTRIES_LIMIT: number;
 
+    SHORT_URL_ID_LENGTH: number;
+
 }
 
 export interface jsonURLFormat {

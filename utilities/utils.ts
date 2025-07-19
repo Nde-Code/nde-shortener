@@ -1,20 +1,4 @@
-import { jsonURLMapOfFullDB  } from "../types/types.ts";
-
 import { createJsonResponse } from "./http_response.ts";
-
-export function findUrlKey(data: jsonURLMapOfFullDB, urlToCheck: string): string | null {
-
-    if (!data || Object.keys(data).length === 0) return null;
-  
-    for (const [key, entry] of Object.entries(data)) {
-
-        if (entry.long_url === urlToCheck) return key;
-
-    }
-    
-    return null;
-
-}
 
 export function extractValidID(path: string): string | Response {
 
@@ -44,21 +28,15 @@ export function isValidUrl(url: string): boolean {
     
 }
 
-export function generateRandomString(length: number): string {
+export async function sha256(input: string): Promise<string> {
 
-    const chars: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+	const encoder: TextEncoder = new TextEncoder();
 
-    let result: string = '';
+	const data: Uint8Array<ArrayBufferLike> = encoder.encode(input);
 
-    for (let i = 0; i < length; i++) {
+	const hashBuffer: ArrayBuffer = await crypto.subtle.digest("SHA-256", data);
 
-        const randomIndex: number = Math.floor(Math.random() * chars.length);
-
-        result += chars[randomIndex];
-
-    }
-
-    return result;
+	return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
 
 }
 
