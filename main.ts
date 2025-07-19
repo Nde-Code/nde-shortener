@@ -128,23 +128,23 @@ async function handler(req: Request): Promise<Response> {
 
 		if (!data) return createJsonResponse({ "error": "The body of the POST request is not valid. Please refer to the documentation before sending the request." }, 400);
 
-		const postedURL: string = data.long_url.trim().toLowerCase();
+		const satanizedURL: string = data.long_url.trim().toLowerCase();
 
-		if (!postedURL) return createJsonResponse({ "error": "The field 'long_url' is required but missing." }, 400);
+		if (!satanizedURL) return createJsonResponse({ "error": "The field 'long_url' is required but missing." }, 400);
 
 		const keys = Object.keys(data as object);
 
 		if (keys.length !== 1 || keys[0] !== "long_url") return createJsonResponse({ "error": "The body contains unexpected field." }, 400);
 
-		if (!isValidUrl(postedURL)) return createJsonResponse({ "error": "The provided long_url is not in a valid URL format." }, 400);
+		if (!isValidUrl(satanizedURL)) return createJsonResponse({ "error": "The provided long_url is not in a valid URL format." }, 400);
 
-		const urlKey: string = (await sha256(postedURL)).slice(0, config.SHORT_URL_ID_LENGTH);
+		const urlKey: string = (await sha256(satanizedURL)).slice(0, config.SHORT_URL_ID_LENGTH);
 
 		const existing: jsonURLFormat | null = await readInFirebaseRTDB<jsonURLFormat>(config.FIREBASE_URL, `/${config.FIREBASE_HIDDEN_PATH}/${urlKey}`);
 
 		if (existing) {
 
-			if (existing.long_url === postedURL) return createJsonResponse({ "link": `${url.origin}/url/${urlKey}` }, 200);
+			if (existing.long_url === satanizedURL) return createJsonResponse({ "link": `${url.origin}/url/${urlKey}` }, 200);
 				
 			else return createJsonResponse({ "error": "Hash collision detected, please try again." }, 500);
 			
@@ -158,7 +158,7 @@ async function handler(req: Request): Promise<Response> {
 
 		const firebaseData: jsonURLFormat = {
 
-			long_url: postedURL,
+			long_url: satanizedURL,
 
 			post_date: new Date().toISOString(),
 
