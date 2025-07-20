@@ -14,10 +14,14 @@ export const config: Config = {
 
     DAILY_LIMIT: 10,
 
+    IPS_PURGE_TIME_DAYS: 1,
+
     FIREBASE_TIMEOUT: 6000,
 
     FIREBASE_ENTRIES_LIMIT: 500,
 
-    SHORT_URL_ID_LENGTH: 14
+    SHORT_URL_ID_LENGTH: 14,
+
+    MAX_URL_LENGTH: 2000
 
 };

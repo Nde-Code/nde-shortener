@@ -12,11 +12,15 @@ export interface Config {
 
     DAILY_LIMIT: number;
 
+    IPS_PURGE_TIME_DAYS: number;
+
     FIREBASE_TIMEOUT: number;
 
     FIREBASE_ENTRIES_LIMIT: number;
 
     SHORT_URL_ID_LENGTH: number;
+
+    MAX_URL_LENGTH: number;
 
 }
 

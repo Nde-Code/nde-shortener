@@ -23,7 +23,7 @@ This project is designed with **GDPR compliance** in mind:
 - ❌ No IP addresses or personal data are stored.  
 - ❌ No logging of user activity.  
 - ⚠️ Basic rate limiting is implemented using **hashed IP addresses**:  
-  - Hashes are used **only in-memory**, not persisted or stored in any database.  
+  - Hashes are used **only in-memory** with [Deno KV](https://docs.deno.com/api/deno/~/Deno.Kv), not persisted or stored in any database.  
   - IP hashes are discarded on server restart.  
 - ✅ No tracking, cookies, or analytics.
 

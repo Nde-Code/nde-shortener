@@ -26,7 +26,9 @@ async function handler(req: Request): Promise<Response> {
 
 	if (!config.FIREBASE_URL || !config.FIREBASE_HIDDEN_PATH || !config.HASH_KEY) return createJsonResponse({ "error": "Your credentials are missing. Please check your .env file." }, 500);
 	
-	if (!checkTimeRateLimit(hashedIP)) return createJsonResponse({ "warning": "Rate limit exceeded: only 1 request per second is allowed." }, 429);
+	if (!hashedIP || hashedIP.length !== 64) return createJsonResponse({ "error": "Unable to hash your IP but it's required for security." }, 403);
+
+	if (!(await checkTimeRateLimit(hashedIP))) return createJsonResponse({ "warning": "Rate limit exceeded: only 1 request per second is allowed." }, 429);
 
 	if (req.method === "OPTIONS") {
 
@@ -138,6 +140,8 @@ async function handler(req: Request): Promise<Response> {
 
 		if (!isValidUrl(satanizedURL)) return createJsonResponse({ "error": "The provided long_url is not in a valid URL format." }, 400);
 
+		if (satanizedURL.length > config.MAX_URL_LENGTH) return createJsonResponse({ "error": `The URL is too long (${data.long_url.length} characters). Maximum allowed length is ${config.MAX_URL_LENGTH} characters.` }, 400);
+
 		const urlKey: string = (await sha256(satanizedURL)).slice(0, config.SHORT_URL_ID_LENGTH);
 
 		const existing: jsonURLFormat | null = await readInFirebaseRTDB<jsonURLFormat>(config.FIREBASE_URL, `/${config.FIREBASE_HIDDEN_PATH}/${urlKey}`);
@@ -154,7 +158,7 @@ async function handler(req: Request): Promise<Response> {
 		
 		if (completeDB && Object.keys(completeDB).length > config.FIREBASE_ENTRIES_LIMIT) return createJsonResponse({ "error": "The database has reached the limit of entries." }, 507);
 
-		if (!checkDailyRateLimit(hashedIP)) return createJsonResponse({ "warning": "Rate limit exceeded: maximum of 10 write requests allowed per day." }, 429);
+		if (!(await checkDailyRateLimit(hashedIP))) return createJsonResponse({ "warning": "Rate limit exceeded: maximum of 10 write requests allowed per day." }, 429);
 
 		const firebaseData: jsonURLFormat = {
 
