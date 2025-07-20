@@ -8,7 +8,7 @@ import { setIsVerifiedTrue, VerificationStatus } from "./utilities/verify.ts";
 
 import { Config, jsonURLFormat, jsonURLMapOfFullDB, postBODYType } from "./types/types.ts";
 
-import { isConfigValid, extractValidID, isValidUrl, sha256, parseJsonBody } from "./utilities/utils.ts";
+import { isConfigValidWithMinValues, extractValidID, isValidUrl, sha256, parseJsonBody } from "./utilities/utils.ts";
 
 import { getIp, checkTimeRateLimit, checkDailyRateLimit, hashIp } from "./utilities/rate.ts";
 
@@ -24,7 +24,7 @@ async function handler(req: Request): Promise<Response> {
 
 	const hashedIP: string = await hashIp(getIp(req));
 
-	const configRules: Partial<Record<keyof Config, number>> = {
+	const configMinValues: Partial<Record<keyof Config, number>> = {
 
 		RATE_LIMIT_INTERVAL_MS: 1000,
 
@@ -44,7 +44,7 @@ async function handler(req: Request): Promise<Response> {
 
 	if (!config.FIREBASE_URL || !config.FIREBASE_HIDDEN_PATH || !config.HASH_KEY) return createJsonResponse({ "error": "Your credentials are missing. Please check your .env file." }, 500);
 	
-	if (!isConfigValid(config, configRules)) return createJsonResponse({ "error": "Invalid configuration detected in your config.ts file. Please refer to the documentation." }, 500);
+	if (!isConfigValidWithMinValues(config, configMinValues)) return createJsonResponse({ "error": "Invalid configuration detected in your config.ts file. Please refer to the documentation." }, 500);
 
 	if (!hashedIP || hashedIP.length !== 64) return createJsonResponse({ "error": "Unable to hash your IP but it's required for security." }, 403);
 

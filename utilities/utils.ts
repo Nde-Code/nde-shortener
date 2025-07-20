@@ -2,7 +2,7 @@ import { createJsonResponse } from "./http_response.ts";
 
 import { Config } from "../types/types.ts";
 
-export function isConfigValid(config: Config, rules: Partial<Record<keyof Config, number>>): boolean {
+export function isConfigValidWithMinValues(config: Config, rules: Partial<Record<keyof Config, number>>): boolean {
 
     for (const [key, minValue] of Object.entries(rules)) {
 
