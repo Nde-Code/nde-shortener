@@ -9,6 +9,7 @@ A simple and lightweight URL shortener built with [Deno](https://deno.land/) and
 ## 📦 Features:
 
 - Security comes first: secrets are stored in a `.env` file, with multiple validations performed before transmission.
+- No duplicate URLs (saves space in your database).
 - Generate short unique codes for URLs (avoid collisions).
 - Redirect users to original URLs.
 - Store mappings in Firebase Realtime Database.
@@ -37,6 +38,15 @@ This ensures that no identifiable user data is collected, stored, or shared in a
 
 ## 🌐 API Endpoints:
 
+To use this **API endpoints** you can use:
+
+- JavaScript: CORS is `enable` and for all domains `*`.
+
+- CURL: [https://curl.se/](https://curl.se/)
+
+- Postman *(Recommended)*: [https://www.postman.com/](https://www.postman.com/)
+
+### Here’s a complete list of the available methods:
 | Method | Endpoint           | Description                                                                 | Request Body                                 | Response                                                                                                                                       |
 |--------|--------------------|-----------------------------------------------------------------------------|----------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
 | POST   | `/post-url`        | Create a short URL from a long one.                                         | `{ "long_url": "https://example.com" }`      | `200 OK`: `{ "link": "https://.../:code" }`  <br> `400 Bad Request`: Invalid body, missing `long_url`, unexpected field, or invalid URL format <br> `429 Too Many Requests`: Rate limit exceeded <br> `507 Insufficient Storage`: Database limit reached |
@@ -54,5 +64,73 @@ For those who want to create their own instance.
 ### 1. Clone the project and go in the folder:
 
 ```bash
-git clone https://github.com/yourusername/deno-url-shortener.git
-cd deno-url-shortener
+git clone https://github.com/Nde-Code/nde-shortener.git
+cd nde-shortener
+```
+
+### 2. Create a Firebase Realtime Database to store the links:
+
+1. Go to [firebase.google.com](https://firebase.google.com/) and create an account.  
+   > _(If you already have a Google account, you're good to go.)_
+
+2. Create a **project** and set up a `Realtime Database`.
+
+   > 🔍 If you get stuck, feel free to check out the official [Firebase documentation](https://firebase.google.com/docs/build?hl=en), or search on Google, YouTube, etc.
+
+3. Once your database is ready, go to the **`Rules`** tab and paste the following in the editor:
+```JSON
+{
+  
+  "rules": {
+
+    "YOUR_SECRET_PATH": {
+        
+      ".read": true,
+          
+      "$shortcode": {
+          
+        ".write": "(!data.exists() && newData.exists()) || (data.exists() && !newData.exists()) || (data.exists() && newData.exists() && data.child('long_url').val() === newData.child('long_url').val() && data.child('post_date').val() === newData.child('post_date').val() && newData.child('is_verified').isBoolean() && newData.hasChild('post_date') && newData.child('long_url').isString() && newData.child('post_date').isString())",
+          
+        ".validate": "(!newData.exists()) || (newData.child('is_verified').isBoolean() && newData.child('long_url').isString() && newData.child('long_url').val().length <= 2000 && newData.child('long_url').val().matches(/^(ht|f)tp(s?):\\/\\/[0-9a-zA-Z]([\\-\\.\\w]*[0-9a-zA-Z])*(?::[0-9]+)?(\\/.*)?$/) && newData.child('post_date').isString() && newData.child('post_date').val().matches(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z$/))",
+          
+        "long_url": {
+              
+          ".validate": "newData.isString() && newData.val().length <= 2000 && newData.val().matches(/^(ht|f)tp(s?):\\/\\/[0-9a-zA-Z]([\\-\\.\\w]*[0-9a-zA-Z])*(?::[0-9]+)?(\\/.*)?$/)"
+            
+        },
+
+        "post_date": {
+              
+          ".validate": "newData.isString() && newData.val().matches(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z$/)"
+            
+        },
+
+        "is_verified": {
+              
+          ".validate": "newData.isBoolean()"
+              
+        },
+
+        "$other": {
+              
+          ".validate": false
+              
+        }
+        
+      }
+        
+    }
+      
+  }
+  
+}
+```
+
+### 3. Edit your `.env` file:
+
+```env
+FIREBASE_HOST_LINK="YOUR_FIREBASE_URL"
+FIREBASE_HIDDEN_PATH="YOUR_SECRET_PATH"
+HASH_KEY="THE_KEY_USED_TO_HASH_IPS"
+ADMIN_KEY="THE_ADMIN_KEY_TO_DELETE_AND_VERIFY"
+```
