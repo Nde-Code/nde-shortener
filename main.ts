@@ -6,11 +6,11 @@ import { deleteInFirebaseRTDB } from "./utilities/delete.ts";
 
 import { setIsVerifiedTrue, VerificationStatus } from "./utilities/verify.ts";
 
-import { jsonURLFormat, jsonURLMapOfFullDB, postBODYType } from "./types/types.ts";
+import { Config, jsonURLFormat, jsonURLMapOfFullDB, postBODYType } from "./types/types.ts";
 
-import { parseJsonBody, isValidUrl, extractValidID, sha256 } from "./utilities/utils.ts";
+import { isConfigValid, extractValidID, isValidUrl, sha256, parseJsonBody } from "./utilities/utils.ts";
 
-import { getIp, hashIp, checkTimeRateLimit, checkDailyRateLimit } from "./utilities/rate.ts";
+import { getIp, checkTimeRateLimit, checkDailyRateLimit, hashIp } from "./utilities/rate.ts";
 
 import { createJsonResponse } from "./utilities/http_response.ts";
 
@@ -24,8 +24,28 @@ async function handler(req: Request): Promise<Response> {
 
 	const hashedIP: string = await hashIp(getIp(req));
 
+	const configRules: Partial<Record<keyof Config, number>> = {
+
+		RATE_LIMIT_INTERVAL_MS: 1000,
+
+		DAILY_LIMIT: 1,
+
+		IPS_PURGE_TIME_DAYS: 1,
+
+		FIREBASE_TIMEOUT: 1000,
+
+		FIREBASE_ENTRIES_LIMIT: 100,
+
+		SHORT_URL_ID_LENGTH: 10,
+
+		MAX_URL_LENGTH: 500
+
+	}
+
 	if (!config.FIREBASE_URL || !config.FIREBASE_HIDDEN_PATH || !config.HASH_KEY) return createJsonResponse({ "error": "Your credentials are missing. Please check your .env file." }, 500);
 	
+	if (!isConfigValid(config, configRules)) return createJsonResponse({ "error": "Invalid configuration detected in your config.ts file. Please refer to the documentation." }, 500);
+
 	if (!hashedIP || hashedIP.length !== 64) return createJsonResponse({ "error": "Unable to hash your IP but it's required for security." }, 403);
 
 	if (!(await checkTimeRateLimit(hashedIP))) return createJsonResponse({ "warning": "Rate limit exceeded: only 1 request per second is allowed." }, 429);

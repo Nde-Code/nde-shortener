@@ -1,5 +1,21 @@
 import { createJsonResponse } from "./http_response.ts";
 
+import { Config } from "../types/types.ts";
+
+export function isConfigValid(config: Config, rules: Partial<Record<keyof Config, number>>): boolean {
+
+    for (const [key, minValue] of Object.entries(rules)) {
+
+        const value = config[key as keyof Config];
+
+        if (typeof value !== "number" || value < (minValue ?? 0)) return false;
+
+    }
+
+    return true;
+
+}
+
 export function extractValidID(path: string): string | Response {
 
     const id: string = path.split("/")[2];
