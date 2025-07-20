@@ -34,11 +34,11 @@ async function handler(req: Request): Promise<Response> {
 
 		FIREBASE_TIMEOUT: 1000,
 
-		FIREBASE_ENTRIES_LIMIT: 100,
+		FIREBASE_ENTRIES_LIMIT: 50,
 
 		SHORT_URL_ID_LENGTH: 10,
 
-		MAX_URL_LENGTH: 500
+		MAX_URL_LENGTH: 100
 
 	}
 
