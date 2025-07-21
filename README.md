@@ -33,12 +33,6 @@ This project is designed with **GDPR compliance** in mind:
 
 This ensures that no identifiable user data is collected, stored, or shared in any form.
 
-## 🧰 Tech Stack:
-
-- **Deno** – TypeScript runtime.
-- **Firebase RTDB** – Realtime database for storing URLs.
-- **Fetch API** – Used for HTTP requests to Firebase.
-
 ## 🌐 API Endpoints:
 
 To use this **API endpoints** you can use:
