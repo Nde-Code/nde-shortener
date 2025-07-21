@@ -2,6 +2,8 @@
 
 A simple and lightweight URL shortener built with [Deno](https://deno.land/) and [Firebase Realtime Database](https://firebase.google.com/products/realtime-database).
 
+**Note**: this is a work in progress.
+
 > At the beginning, it was my first project using Deno to build a REST API. I kept adding features, and now I'm sharing it publicly on my GitHub.
 
 > I haven't picked a real name for the project yet, so I just called it: `nde-shortener`.
@@ -10,6 +12,7 @@ A simple and lightweight URL shortener built with [Deno](https://deno.land/) and
 
 - Security comes first: secrets are stored in a `.env` file, with multiple validations performed before transmission.
 - No duplicate URLs (saves space in your database).
+- Highly configurable.
 - Generate short unique codes for URLs (avoid collisions).
 - Redirect users to original URLs.
 - Store mappings in Firebase Realtime Database.
@@ -40,7 +43,7 @@ This ensures that no identifiable user data is collected, stored, or shared in a
 
 To use this **API endpoints** you can use:
 
-- JavaScript: CORS is `enable` and for all domains `*`.
+- JavaScript: CORS is `enabled` and for all domains (`*`).
 
 - CURL: [https://curl.se/](https://curl.se/)
 
@@ -61,14 +64,85 @@ To use this **API endpoints** you can use:
 
 For those who want to create their own instance.
 
-### 1. Clone the project and go in the folder:
+### 1. Install deno, clone the project and go in the folder:
+
+First of all, you need to have [Deno](https://deno.com/) installed on your system.
+
+> Take a look at this page: [https://docs.deno.com/runtime/getting_started/installation/](https://docs.deno.com/runtime/getting_started/installation/)
 
 ```bash
 git clone https://github.com/Nde-Code/nde-shortener.git
 cd nde-shortener
 ```
 
-### 2. Create a Firebase Realtime Database to store the links:
+### 2. Edit your `.env` file:
+
+```env
+FIREBASE_HOST_LINK="YOUR_FIREBASE_URL"
+FIREBASE_HIDDEN_PATH="YOUR_SECRET_PATH"
+HASH_KEY="THE_KEY_USED_TO_HASH_IPS"
+ADMIN_KEY="THE_ADMIN_KEY_TO_DELETE_AND_VERIFY"
+```
+
+Where:
+
+- **FIREBASE_HOST_LINK**: The URL of your Firebase Realtime Database.
+
+- **FIREBASE_HIDDEN_PATH**: A secret directory where data is stored. This approach follows the principle of `security through obscurity`.
+
+- **HASH_KEY**: The `SALT` value used to hash IP addresses.
+
+- **ADMIN_KEY**: An administrative key that grants the owner permission to `delete` and `verify` links.
+
+### 3. Edit the `config.ts` file:
+
+Open the file `config.ts` and normally you should see in:
+
+```ts
+export const config: Config = {
+
+  FIREBASE_URL: Deno.env.get("FIREBASE_HOST_LINK") ?? "",
+
+  FIREBASE_HIDDEN_PATH: Deno.env.get("FIREBASE_HIDDEN_PATH") ?? "",
+
+  HASH_KEY: Deno.env.get("HASH_KEY") ?? "",
+
+  ADMIN_KEY: Deno.env.get("ADMIN_KEY") ?? "",
+    
+  RATE_LIMIT_INTERVAL_MS: 1000,
+
+  DAILY_LIMIT: 10,
+
+  IPS_PURGE_TIME_DAYS: 1,
+
+  FIREBASE_TIMEOUT: 6000,
+
+  FIREBASE_ENTRIES_LIMIT: 500,
+
+  SHORT_URL_ID_LENGTH: 14,
+
+  MAX_URL_LENGTH: 2000
+
+};
+```
+
+- **FIREBASE_URL**, **FIREBASE_HIDDEN_PATH**, **HASH_KEY**, **ADMIN_KEY**: These are values read from the `.env` file, so please **do not modify them**.
+
+- **RATE_LIMIT_INTERVAL_MS**: This is the rate limit based on requests. Default: one request per second.
+
+- **DAILY_LIMIT**: Posting rate limit per day. Default: 10 writes per day.
+
+- **IPS_PURGE_TIME_DAYS**: The number of days before purging the `Deno.kv` store that contains hashed IPs used for rate limiting. Default: 1 day.
+
+- **FIREBASE_TIMEOUT**: The timeout limit for HTTP requests to the Firebase Realtime Database. Default: 6 seconds.
+
+- **FIREBASE_ENTRIES_LIMIT**: The maximum number of entries allowed in your Firebase Realtime Database. Default: 500 entries.
+
+- **SHORT_URL_ID_LENGTH**: The length of the shortcode used for shortened URLs. You should probably not change this value to ensure no collisions occur with `sha256`. Default: 14 characters.
+
+- **MAX_URL_LENGTH**: The maximum allowed URL length in the Firebase Realtime Database. Default: 2000 characters.
+
+### 4. Create a Firebase Realtime Database to store the links:
 
 1. Go to [firebase.google.com](https://firebase.google.com/) and create an account.  
    > _(If you already have a Google account, you're good to go.)_
@@ -126,11 +200,23 @@ cd nde-shortener
 }
 ```
 
-### 3. Edit your `.env` file:
+Here is a brief summary of these rules:
 
-```env
-FIREBASE_HOST_LINK="YOUR_FIREBASE_URL"
-FIREBASE_HIDDEN_PATH="YOUR_SECRET_PATH"
-HASH_KEY="THE_KEY_USED_TO_HASH_IPS"
-ADMIN_KEY="THE_ADMIN_KEY_TO_DELETE_AND_VERIFY"
+| Action        | Allowed if...                                                                         |
+|---------------|----------------------------------------------------------------------------------------|
+| **Read**      | Always allowed                                                                         |
+| **Write**    | Valid `long_url`, `post_date`, and `is_verified` *(required)* fields                                |
+| **Delete**    | Always allowed                                                                         |
+| **Update**    | Only `is_verified` can change; `long_url` and `post_date` must stay the same           |
+| **Extra fields** | Not allowed                                                                         |
+
+
+## 5. Run the project:
+
+When you are here, you can run the project by simply typing:
+
+```bash
+deno task dev
 ```
+
+And **Enjoy !!**
