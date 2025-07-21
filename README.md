@@ -70,6 +70,8 @@ First of all, you need to have [Deno](https://deno.com/) installed on your syste
 
 > Take a look at this page: [https://docs.deno.com/runtime/getting_started/installation/](https://docs.deno.com/runtime/getting_started/installation/)
 
+Once that's done, clone this repository and go into the folder using:
+
 ```bash
 git clone https://github.com/Nde-Code/nde-shortener.git
 cd nde-shortener
