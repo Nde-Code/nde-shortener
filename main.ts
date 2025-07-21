@@ -58,7 +58,7 @@ async function handler(req: Request): Promise<Response> {
 
 			{
 
-				"Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+				"Access-Control-Allow-Methods": "GET, DELETE, POST, OPTIONS",
 
 				"Access-Control-Allow-Headers": "Content-Type, Authorization",
 
