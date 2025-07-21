@@ -77,7 +77,7 @@ git clone https://github.com/Nde-Code/nde-shortener.git
 cd nde-shortener
 ```
 
-### 2. Edit your `.env` file:
+### 2. Create and edit the `.env` file:
 
 ```env
 FIREBASE_HOST_LINK="YOUR_FIREBASE_URL"
@@ -215,7 +215,7 @@ Here is a brief summary of these rules:
 
 ## 5. Run the project:
 
-When you are here, you can run the project by simply typing:
+When setup is complete, start the project with:
 
 ```bash
 deno task dev

@@ -92,9 +92,9 @@ async function handler(req: Request): Promise<Response> {
 
 		if (result === "verified_now") return createJsonResponse({ "success": "The link has been verified successfully." }, 200);	
 
-		else if (result === "already_verified") return createJsonResponse({ "warning": "This link was already verified." }, 200);
+		else if (result === "already_verified") return createJsonResponse({ "warning": "This link is already verified." }, 200);
 
-		else if (result === "not_found") return createJsonResponse({ "error": "This link was not found in the database." }, 404);
+		else if (result === "not_found") return createJsonResponse({ "error": "No record of this link was found in the database." }, 404);
 
 	}
 
@@ -112,7 +112,7 @@ async function handler(req: Request): Promise<Response> {
 
 			if (data === true) return createJsonResponse({ "success": "The link has been deleted correctly." }, 200)
 			
-			else return createJsonResponse({ "error": "This link was not found in the database. Sorry !" }, 404);
+			else return createJsonResponse({ "error": "No record of this link was found in the database." }, 404);
 
 		}
 	
@@ -140,7 +140,7 @@ async function handler(req: Request): Promise<Response> {
 
 		}
 		
-		else return createJsonResponse({ "error": "This link was not found in the database. Sorry !" }, 404);
+		else return createJsonResponse({ "error": "No record of this link was found in the database." }, 404);
 	
 	}
 
