@@ -17,6 +17,7 @@ A simple and lightweight URL shortener built with [Deno](https://deno.land/) and
 - Redirect users to original URLs.
 - Store mappings in Firebase Realtime Database.
 - Minimal and fast REST API.
+- Multi-language support for response messages.
 - Written in TypeScript with Deno runtime.
 - `is_verified` and `delete` actions implemented.
 
@@ -71,26 +72,7 @@ git clone https://github.com/Nde-Code/nde-shortener.git
 cd nde-shortener
 ```
 
-### 2. Create and edit the `.env` file:
-
-```env
-FIREBASE_HOST_LINK="YOUR_FIREBASE_URL"
-FIREBASE_HIDDEN_PATH="YOUR_SECRET_PATH"
-HASH_KEY="THE_KEY_USED_TO_HASH_IPS"
-ADMIN_KEY="THE_ADMIN_KEY_TO_DELETE_AND_VERIFY"
-```
-
-Where:
-
-- **FIREBASE_HOST_LINK**: The URL of your Firebase Realtime Database.
-
-- **FIREBASE_HIDDEN_PATH**: A secret directory where data is stored. This approach follows the principle of `security through obscurity`.
-
-- **HASH_KEY**: The `SALT` value used to hash IP addresses.
-
-- **ADMIN_KEY**: An administrative key that grants the owner permission to `delete` and `verify` links.
-
-### 3. Edit the `config.ts` file:
+### 2. Edit the `config.ts` file:
 
 Open the file `config.ts` and normally you should see in:
 
@@ -104,6 +86,8 @@ export const config: Config = {
   HASH_KEY: Deno.env.get("HASH_KEY") ?? "",
 
   ADMIN_KEY: Deno.env.get("ADMIN_KEY") ?? "",
+
+  LANG_CODE: 'en',
     
   RATE_LIMIT_INTERVAL_MS: 1000,
 
@@ -124,6 +108,8 @@ export const config: Config = {
 
 - **FIREBASE_URL**, **FIREBASE_HIDDEN_PATH**, **HASH_KEY**, **ADMIN_KEY**: These are values read from the `.env` file, so please **do not modify them**.
 
+- **LANG_CODE**: Supported language translations are available for responses. Currently, `fr` and `en` are supported (default is `en`).
+
 - **RATE_LIMIT_INTERVAL_MS**: This is the rate limit based on requests. Default: one request per second.
 
 - **DAILY_LIMIT**: Posting rate limit per day. Default: 10 writes per day.
@@ -138,7 +124,7 @@ export const config: Config = {
 
 - **MAX_URL_LENGTH**: The maximum allowed URL length in the Firebase Realtime Database. Default: 2000 characters.
 
-### 4. Create a Firebase Realtime Database to store the links:
+### 3. Create a Firebase Realtime Database to store the links:
 
 1. Go to [firebase.google.com](https://firebase.google.com/) and create an account.  
    > _(If you already have a Google account, you're good to go.)_
@@ -147,7 +133,7 @@ export const config: Config = {
 
    > 🔍 If you get stuck, feel free to check out the official [Firebase documentation](https://firebase.google.com/docs/build?hl=en), or search on Google, YouTube, etc.
 
-3. Once your database is ready, go to the **`Rules`** tab and paste the following in the editor:
+3. Once your database is ready, go to the **`Rules`** tab and paste the following code in the editor:
 ```JSON
 {
   
@@ -206,6 +192,24 @@ Here is a brief summary of these rules:
 | **Update**    | Only `is_verified` can change; `long_url` and `post_date` must stay the same           |
 | **Extra fields** | Not allowed                                                                         |
 
+### 4. Create and edit the `.env` file:
+
+```env
+FIREBASE_HOST_LINK="YOUR_FIREBASE_URL"
+FIREBASE_HIDDEN_PATH="YOUR_SECRET_PATH"
+HASH_KEY="THE_KEY_USED_TO_HASH_IPS"
+ADMIN_KEY="THE_ADMIN_KEY_TO_DELETE_AND_VERIFY"
+```
+
+With:
+
+- **FIREBASE_HOST_LINK**: The URL of your Firebase Realtime Database.
+
+- **FIREBASE_HIDDEN_PATH**: A secret directory where data is stored. This approach follows the principle of `security through obscurity`.
+
+- **HASH_KEY**: The `SALT` value used to hash IP addresses.
+
+- **ADMIN_KEY**: An administrative key that grants the owner permission to `delete` and `verify` links.
 
 ## 5. Run the project:
 

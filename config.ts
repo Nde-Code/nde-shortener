@@ -9,6 +9,8 @@ export const config: Config = {
     HASH_KEY: Deno.env.get("HASH_KEY") ?? "",
 
     ADMIN_KEY: Deno.env.get("ADMIN_KEY") ?? "",
+
+    LANG_CODE: 'en',
     
     RATE_LIMIT_INTERVAL_MS: 1000,
 
