@@ -198,7 +198,7 @@ async function handler(req: Request): Promise<Response> {
 
 	}
 
-	return createJsonResponse({ "error": "The requested endpoint is invalid." }, 404);
+	else return createJsonResponse({ "error": "The requested endpoint is invalid." }, 404);
 
 }
 
