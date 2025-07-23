@@ -38,11 +38,13 @@ This project is designed with **GDPR compliance** in mind:
 
 - ❌ No logging of user activity. 
 
-- ⚠️ **The basic rate limiting** is implemented using **hashed IP addresses**:  
+- ⚠️ **Basic rate limiting** is implemented by hashing **IP addresses**:
+
+  - Hashing is done using `SHA-256`, combined with a strong, secret **salt**.
 
   - Hashes are used **only in-memory** with [Deno KV](https://docs.deno.com/api/deno/~/Deno.Kv), not persisted or stored in any external database.
 
-  - IP hashes are completely deleted after each configured delay (`IPS_PURGE_TIME_DAYS`).  
+  - IP hashes are automatically deleted after a configurable retention period (`IPS_PURGE_TIME_DAYS`). A duration of 24 hours is recommended for GDPR compliance.  
 
 - ✅ No tracking, cookies, or analytics.
 
@@ -62,7 +64,7 @@ To use this **API endpoints** you can use:
 | Method | Endpoint           | Description                                                                 | Request Body                                 | Response                                                                                                                                       |
 |--------|--------------------|-----------------------------------------------------------------------------|----------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
 | **POST**   | `/post-url`        | Create a short URL from a long one.                                         | `{ "long_url": "https://example.com" }`      | `200 OK`: `{ "link": "https://.../:code" }`  <br> `400 Bad Request`: Invalid body, missing `long_url`, unexpected field, or invalid URL format <br> `429 Too Many Requests`: Rate limit exceeded <br> `507 Insufficient Storage`: Database limit reached |
-| **GET**    | `/urls`            | Retrieve the full list of stored links. **API/ADMIN key required**                               | *None*                                       | `200 OK`: `{ [code]: { long_url: string, post_date: string, is_verified: boolean } }` <br> or `no URL(s)` <br> `401 Unauthorized`: Invalid API key                                       |
+| **GET**    | `/urls`            | Retrieve the full list of stored links. **API/ADMIN key required**                               | *None*                                       | `200 OK`: `{ [code]: { long_url: string, post_date: string, is_verified: boolean } } if link(s)` <br> or `no URL(s)` otherwise <br> `401 Unauthorized`: Invalid API key                                       |
 | **GET**    | `/url/:code`       | Redirect to the original long URL associated with the short code.           | *None*                                       | `301 Moved Permanently` (if `is_verified = false`) <br> `302 Found` (otherwise) <br> `404 Not Found`: Invalid or unknown code                  |
 | **GET**    | `/verify/:code`    | Mark the URL as verified (`is_verified = true`). **API/ADMIN key required** | *None*                                       | `200 OK`: Verified successfully / Already verified <br> `404 Not Found` <br> `401 Unauthorized`: Invalid API key                               |
 | **GET**    | `/delete/:code`    | Delete a shortened URL from the database. **API/ADMIN key required**     | *None*                                       | `200 OK`: Link deleted <br> `404 Not Found` <br> `401 Unauthorized`: Invalid API key                                                           |
