@@ -32,7 +32,9 @@ export const translations = {
 
             RATE_LIMIT_EXCEEDED: `Rate limit exceeded: only 1 request per ${config.RATE_LIMIT_INTERVAL_S}s allowed.`,
 
-            NO_URLS_IN_DB: "Sorry no url(s) to retreive from the database.",
+            WRONG_API_KEY_FOR_URLS_DB: "The API key provided for the db of URLs is incorrect or missing.",
+
+            NO_URLS_IN_DB: "Sorry no URL(s) to retreive from the database.",
 
             WRONG_API_KEY_FOR_VERIFICATION: "The API key provided for link verification is incorrect or missing.",
 
@@ -92,6 +94,8 @@ export const translations = {
             
             RATE_LIMIT_EXCEEDED: `Limite de requêtes dépassée: une seule requête toutes les ${config.RATE_LIMIT_INTERVAL_S}s.`,
             
+            WRONG_API_KEY_FOR_URLS_DB: "La clé API fournie pour obtenir la liste des URLs est incorrecte ou manquante.",
+
             NO_URLS_IN_DB: "Désolé, aucune URL à récupérer depuis la base de données.",
             
             WRONG_API_KEY_FOR_VERIFICATION: "La clé API fournie pour la vérification du lien est incorrecte ou manquante.",

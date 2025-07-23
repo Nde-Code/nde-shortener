@@ -2,8 +2,6 @@
 
 A simple and lightweight URL shortener built with [Deno](https://deno.land/) and [Firebase Realtime Database](https://firebase.google.com/products/realtime-database).
 
-**Note**: this is a work in progress.
-
 > At the beginning, it was my first project using Deno to build a REST API. I kept adding features, and now I'm sharing it publicly on my GitHub.
 
 > I haven't picked a real name for the project yet, so I just called it: `nde-shortener`.
@@ -11,26 +9,41 @@ A simple and lightweight URL shortener built with [Deno](https://deno.land/) and
 ## 📦 Features:
 
 - Security comes first: secrets are stored in a `.env` file, with multiple validations performed before transmission.
+
 - No duplicate URLs (saves space in your database).
+
 - No sign-up, no credit card, or other personal information required.
+
 - Highly configurable.
+
 - Generate short unique codes for URLs (avoid collisions).
+
 - Redirect users to original URLs.
+
 - Store mappings in Firebase Realtime Database.
+
 - Minimal and fast REST API.
+
 - Multi-language support for response messages.
+
 - Written in TypeScript with Deno runtime.
+
 - `is_verified` and `delete` actions implemented.
 
 ## 🛡 GDPR Compliance:
 
 This project is designed with **GDPR compliance** in mind:
 
-- ❌ No IP addresses or personal data are stored.  
-- ❌ No logging of user activity.  
-- ⚠️ Basic rate limiting is implemented using **hashed IP addresses**:  
-  - Hashes are used **only in-memory** with [Deno KV](https://docs.deno.com/api/deno/~/Deno.Kv), not persisted or stored in any database.  
-  - IP hashes are discarded on server restart.  
+- ❌ No direct IP addresses or personal data are stored.
+
+- ❌ No logging of user activity. 
+
+- ⚠️ **The basic rate limiting** is implemented using **hashed IP addresses**:  
+
+  - Hashes are used **only in-memory** with [Deno KV](https://docs.deno.com/api/deno/~/Deno.Kv), not persisted or stored in any external database.
+
+  - IP hashes are completely deleted after each configured delay (`IPS_PURGE_TIME_DAYS`).  
+
 - ✅ No tracking, cookies, or analytics.
 
 This ensures that no identifiable user data is collected, stored, or shared in any form.
@@ -41,24 +54,22 @@ To use this **API endpoints** you can use:
 
 - JavaScript: CORS is `enabled` and for all domains (`*`).
 
-- CURL: [https://curl.se/](https://curl.se/)
+- cURL: [https://curl.se/](https://curl.se/)
 
 - Postman *(Recommended)*: [https://www.postman.com/](https://www.postman.com/)
 
 ### Here’s a complete list of the available methods:
 | Method | Endpoint           | Description                                                                 | Request Body                                 | Response                                                                                                                                       |
 |--------|--------------------|-----------------------------------------------------------------------------|----------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
-| POST   | `/post-url`        | Create a short URL from a long one.                                         | `{ "long_url": "https://example.com" }`      | `200 OK`: `{ "link": "https://.../:code" }`  <br> `400 Bad Request`: Invalid body, missing `long_url`, unexpected field, or invalid URL format <br> `429 Too Many Requests`: Rate limit exceeded <br> `507 Insufficient Storage`: Database limit reached |
-| GET    | `/urls`            | Retrieve the full list of stored links.                                     | *None*                                       | `200 OK`: `{ [code]: { long_url: string, post_date: string, is_verified: boolean } }` <br> or `No links`                                       |
-| GET    | `/url/:code`       | Redirect to the original long URL associated with the short code.           | *None*                                       | `301 Moved Permanently` (if `is_verified = false`) <br> `302 Found` (otherwise) <br> `404 Not Found`: Invalid or unknown code                  |
-| GET    | `/verify/:code`    | Mark the URL as verified (`is_verified = true`). **API/ADMIN key required** | *None*                                       | `200 OK`: Verified successfully / Already verified <br> `404 Not Found` <br> `401 Unauthorized`: Invalid API key                               |
-| GET    | `/delete/:code`    | Delete a shortened URL from the database. **API/ADMIN key required**     | *None*                                       | `200 OK`: Link deleted <br> `404 Not Found` <br> `401 Unauthorized`: Invalid API key                                                           |
- 
-
+| **POST**   | `/post-url`        | Create a short URL from a long one.                                         | `{ "long_url": "https://example.com" }`      | `200 OK`: `{ "link": "https://.../:code" }`  <br> `400 Bad Request`: Invalid body, missing `long_url`, unexpected field, or invalid URL format <br> `429 Too Many Requests`: Rate limit exceeded <br> `507 Insufficient Storage`: Database limit reached |
+| **GET**    | `/urls`            | Retrieve the full list of stored links. **API/ADMIN key required**                               | *None*                                       | `200 OK`: `{ [code]: { long_url: string, post_date: string, is_verified: boolean } }` <br> or `no URL(s)` <br> `401 Unauthorized`: Invalid API key                                       |
+| **GET**    | `/url/:code`       | Redirect to the original long URL associated with the short code.           | *None*                                       | `301 Moved Permanently` (if `is_verified = false`) <br> `302 Found` (otherwise) <br> `404 Not Found`: Invalid or unknown code                  |
+| **GET**    | `/verify/:code`    | Mark the URL as verified (`is_verified = true`). **API/ADMIN key required** | *None*                                       | `200 OK`: Verified successfully / Already verified <br> `404 Not Found` <br> `401 Unauthorized`: Invalid API key                               |
+| **GET**    | `/delete/:code`    | Delete a shortened URL from the database. **API/ADMIN key required**     | *None*                                       | `200 OK`: Link deleted <br> `404 Not Found` <br> `401 Unauthorized`: Invalid API key                                                           |
 
 ## 🚀 Getting Started:
 
-For those who want to create their own instance.
+### For those who want to create their own instance.
 
 ### 1. Install deno, clone the project and go in the folder:
 

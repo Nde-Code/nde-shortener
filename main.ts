@@ -74,11 +74,19 @@ async function handler(req: Request): Promise<Response> {
 
 	if (req.method === "GET" && pathname === "/urls") {
 
-		const data: jsonURLFormat | null = await readInFirebaseRTDB<jsonURLFormat>(config.FIREBASE_URL, config.FIREBASE_HIDDEN_PATH);
+		const apiKey: string | null = url.searchParams.get("apiKey");
 
-		if (!data) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'NO_URLS_IN_DB'), 200);
+		if (apiKey !== config.ADMIN_KEY) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'WRONG_API_KEY_FOR_URLS_DB'), 401);
 
-		else return createJsonResponse(data, 200);
+		else {
+
+			const data: jsonURLFormat | null = await readInFirebaseRTDB<jsonURLFormat>(config.FIREBASE_URL, config.FIREBASE_HIDDEN_PATH);
+	
+			if (!data) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'NO_URLS_IN_DB'), 200);
+	
+			else return createJsonResponse(data, 200);
+
+		}
 
 	}
 
