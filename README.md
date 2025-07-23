@@ -12,6 +12,7 @@ A simple and lightweight URL shortener built with [Deno](https://deno.land/) and
 
 - Security comes first: secrets are stored in a `.env` file, with multiple validations performed before transmission.
 - No duplicate URLs (saves space in your database).
+- No sign-up, no credit card, or other personal information required.
 - Highly configurable.
 - Generate short unique codes for URLs (avoid collisions).
 - Redirect users to original URLs.
