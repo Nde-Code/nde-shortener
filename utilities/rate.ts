@@ -18,9 +18,9 @@ export async function checkTimeRateLimit(hashedIp: string): Promise<boolean> {
 
     const entry: Deno.KvEntryMaybe<number> = await kv.get<number>(key);
 
-    if (entry.value && now - entry.value < config.RATE_LIMIT_INTERVAL_MS) return false;
+    if (entry.value && now - entry.value < (config.RATE_LIMIT_INTERVAL_S * 1000)) return false;
 
-    await kv.set(key, now, { expireIn: config.RATE_LIMIT_INTERVAL_MS });
+    await kv.set(key, now, { expireIn: (config.RATE_LIMIT_INTERVAL_S * 1000) });
 
     return true;
     

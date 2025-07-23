@@ -28,7 +28,7 @@ async function handler(req: Request): Promise<Response> {
 
 	const configMinValues: Partial<Record<keyof Config, number>> = {
 
-		RATE_LIMIT_INTERVAL_MS: 1000,
+		RATE_LIMIT_INTERVAL_S: 1,
 
 		DAILY_LIMIT: 1,
 

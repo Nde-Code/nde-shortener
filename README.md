@@ -89,40 +89,48 @@ export const config: Config = {
 
   LANG_CODE: 'en',
     
-  RATE_LIMIT_INTERVAL_MS: 1000,
+  RATE_LIMIT_INTERVAL_S: 1, // min: 1
 
-  DAILY_LIMIT: 10,
+  DAILY_LIMIT: 10, // min: 1
 
-  IPS_PURGE_TIME_DAYS: 1,
+  IPS_PURGE_TIME_DAYS: 1, // min: 1
 
-  FIREBASE_TIMEOUT: 6000,
+  FIREBASE_TIMEOUT: 6000, // min: 1000
 
-  FIREBASE_ENTRIES_LIMIT: 500,
+  FIREBASE_ENTRIES_LIMIT: 500, // min: 50
 
-  SHORT_URL_ID_LENGTH: 14,
+  SHORT_URL_ID_LENGTH: 14, // min: 10
 
-  MAX_URL_LENGTH: 2000
+  MAX_URL_LENGTH: 2000 // min: 100
 
 };
 ```
 
 - **FIREBASE_URL**, **FIREBASE_HIDDEN_PATH**, **HASH_KEY**, **ADMIN_KEY**: These are values read from the `.env` file, so please **do not modify them**.
 
-- **LANG_CODE**: Supported language translations are available for responses. Currently, `fr` and `en` are supported (default is `en`).
+- **LANG_CODE**: Supported language translations are available for responses. At the moment:
 
-- **RATE_LIMIT_INTERVAL_MS**: This is the rate limit based on requests. Default: one request per second.
+  - `fr` = `Français` 
 
-- **DAILY_LIMIT**: Posting rate limit per day. Default: 10 writes per day.
+  - `en` = `English` (Currently)
 
-- **IPS_PURGE_TIME_DAYS**: The number of days before purging the `Deno.kv` store that contains hashed IPs used for rate limiting. Default: 1 day.
+are supported.
 
-- **FIREBASE_TIMEOUT**: The timeout limit for HTTP requests to the Firebase Realtime Database. Default: 6 seconds.
+- **RATE_LIMIT_INTERVAL_S** in [second]: This is the rate limit based on requests. Currently: one request per second.
 
-- **FIREBASE_ENTRIES_LIMIT**: The maximum number of entries allowed in your Firebase Realtime Database. Default: 500 entries.
+- **DAILY_LIMIT** in [day]: Posting rate limit per day. Currently: 10 writes per day.
 
-- **SHORT_URL_ID_LENGTH**: The length of the shortcode used for shortened URLs. You should probably not change this value to ensure no collisions occur with `sha256`. Default: 14 characters.
+- **IPS_PURGE_TIME_DAYS** in [day]: The number of days before purging the `Deno.kv` store that contains hashed IPs used for rate limiting. Currently: 1 day.
 
-- **MAX_URL_LENGTH**: The maximum allowed URL length in the Firebase Realtime Database. Default: 2000 characters.
+- **FIREBASE_TIMEOUT** in [millisecond]: The timeout limit for HTTP requests to the Firebase Realtime Database. Currently: 6 seconds.
+
+- **FIREBASE_ENTRIES_LIMIT**: The maximum number of entries allowed in your Firebase Realtime Database. Currently: 500 entries.
+
+- **SHORT_URL_ID_LENGTH**: The length of the shortcode used for shortened URLs. You should probably not change this value to ensure no collisions occur with `sha256`. Currently: 14 characters.
+
+- **MAX_URL_LENGTH**: The maximum allowed URL length in the Firebase Realtime Database. Currently: 2000 characters.
+
+### Ensure that you respect the `min` value specified in the comment; otherwise, you will get an error message with your configuration.
 
 ### 3. Create a Firebase Realtime Database to store the links:
 
@@ -219,4 +227,4 @@ When setup is complete, start the project with:
 deno task dev
 ```
 
-And **Enjoy !!**
+## 6. Enjoy !

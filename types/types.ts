@@ -12,7 +12,7 @@ export interface Config {
 
     LANG_CODE: supportedLang;
     
-    RATE_LIMIT_INTERVAL_MS: number;
+    RATE_LIMIT_INTERVAL_S: number;
 
     DAILY_LIMIT: number;
 

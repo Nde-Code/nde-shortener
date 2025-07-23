@@ -30,7 +30,7 @@ export const translations = {
 
             WRONG_HASH: "Unable to hash your IP but it's required for security.",
 
-            RATE_LIMIT_EXCEEDED: `Rate limit exceeded: only 1 request / ${config.RATE_LIMIT_INTERVAL_MS}s allowed.`,
+            RATE_LIMIT_EXCEEDED: `Rate limit exceeded: only 1 request per ${config.RATE_LIMIT_INTERVAL_S}s allowed.`,
 
             NO_URLS_IN_DB: "Sorry no url(s) to retreive from the database.",
 
@@ -90,7 +90,7 @@ export const translations = {
             
             WRONG_HASH: "Impossible de générer le hash de votre IP, ce qui est requis pour des raisons de sécurité.",
             
-            RATE_LIMIT_EXCEEDED: `Limite de requêtes dépassée : une seule requête toutes les ${config.RATE_LIMIT_INTERVAL_MS} secondes est autorisée.`,
+            RATE_LIMIT_EXCEEDED: `Limite de requêtes dépassée: une seule requête toutes les ${config.RATE_LIMIT_INTERVAL_S}s.`,
             
             NO_URLS_IN_DB: "Désolé, aucune URL à récupérer depuis la base de données.",
             
@@ -120,7 +120,7 @@ export const translations = {
             
             DB_LIMIT_REACHED: "La base de données a atteint sa limite d'entrées.",
             
-            WRITE_LIMIT_EXCEEDED: "Limite de requêtes dépassée : un maximum de 10 écritures par jour est autorisé.",
+            WRITE_LIMIT_EXCEEDED: "Limite de requêtes dépassée: un maximum de 10 écritures par jour.",
            
             LINK_NOT_GENERATED: "Le lien n'a pas pu être généré à cause d'une erreur interne du serveur.",
             
