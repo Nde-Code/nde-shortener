@@ -28,7 +28,7 @@ A simple and lightweight URL shortener built with [Deno](https://deno.land/) and
 
 - Written in TypeScript with Deno runtime.
 
-- `is_verified` and `delete` actions implemented.
+- `verify` and `delete` actions implemented.
 
 ## 🛡 GDPR Compliance:
 
