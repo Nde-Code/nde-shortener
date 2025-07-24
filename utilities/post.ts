@@ -1,31 +1,43 @@
 import { config } from "../config.ts";
 
-export async function postInFirebaseRTDB<T = unknown, U = unknown>(FIREBASE_URL: string, path: string, data: U): Promise<T | null> {
+export async function putInFirebaseRTDB<T = unknown, U = unknown>(FIREBASE_URL: string, path: string, data: U): Promise<T | null> {
 
     const url: string = `${FIREBASE_URL}${path}.json`;
 
-    const controller = new AbortController();
+    const controller: AbortController = new AbortController();
 
-    const timeoutId = setTimeout(() => controller.abort(), config.FIREBASE_TIMEOUT);
+    const timeoutId: number = setTimeout(() => controller.abort(), config.FIREBASE_TIMEOUT);
 
-    const res: Response = await fetch(url, {
+    try {
 
-        method: "PUT",
+        const res: Response = await fetch(url, {
 
-        headers: {
+            method: "PUT",
 
-            "Content-Type": "application/json",
+            headers: {
 
-        },
+                "Content-Type": "application/json",
 
-        body: JSON.stringify(data),
+            },
 
-    });
+            body: JSON.stringify(data),
 
-    clearTimeout(timeoutId);
+            signal: controller.signal
 
-    if (!res.ok) return null;
+        });
 
-    return (await res.json()) as T;
+        clearTimeout(timeoutId);
+
+        if (!res.ok) return null;
+
+        return (await res.json()) as T;
+
+    } catch(_err) {
+
+        clearTimeout(timeoutId);
+
+        return null;
+
+    }
 
 }

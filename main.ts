@@ -1,4 +1,4 @@
-import { postInFirebaseRTDB } from "./utilities/post.ts";
+import { putInFirebaseRTDB } from "./utilities/post.ts";
 
 import { readInFirebaseRTDB } from "./utilities/read.ts";
 
@@ -200,7 +200,7 @@ async function handler(req: Request): Promise<Response> {
 
 		};
 
-		const result: jsonURLFormat | null = await postInFirebaseRTDB<jsonURLFormat, jsonURLFormat>(config.FIREBASE_URL, `/${config.FIREBASE_HIDDEN_PATH}/${urlKey}`, firebaseData);
+		const result: jsonURLFormat | null = await putInFirebaseRTDB<jsonURLFormat, jsonURLFormat>(config.FIREBASE_URL, `/${config.FIREBASE_HIDDEN_PATH}/${urlKey}`, firebaseData);
 
 		const firebaseResponse: string | null = (result !== null && result.long_url === firebaseData.long_url && result.post_date === firebaseData.post_date && result.is_verified === firebaseData.is_verified) ? `${url.origin}/url/${urlKey}` : null;
 

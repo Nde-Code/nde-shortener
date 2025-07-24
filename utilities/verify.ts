@@ -4,36 +4,68 @@ export type VerificationStatus = "already_verified" | "verified_now" | "not_foun
 
 export async function setIsVerifiedTrue(FIREBASE_URL: string, path: string): Promise<VerificationStatus> {
 
-    const url = `${FIREBASE_URL}${path}.json`;
+    const url: string = `${FIREBASE_URL}${path}.json`;
 
-    const getRes = await fetch(url);
+    const controller: AbortController = new AbortController();
+    
+    const timeoutId: number = setTimeout(() => controller.abort(), config.FIREBASE_TIMEOUT);
 
-    if (!getRes.ok) return "not_found";
+    try {
 
-    const currentData = await getRes.json();
+        const getRes: Response = await fetch(url, { signal: controller.signal });
 
-    if (!currentData) return "not_found";
+        if (!getRes.ok) {
 
-    if (currentData?.is_verified === true) return "already_verified";
+            clearTimeout(timeoutId);
 
-    const controller = new AbortController();
+            return "not_found";
 
-    const timeoutId = setTimeout(() => controller.abort(), config.FIREBASE_TIMEOUT);
+        }
 
-    const patchRes = await fetch(url, {
+        const currentData = await getRes.json();
 
-        method: "PATCH",
+        if (!currentData) {
 
-        headers: { "Content-Type": "application/json" },
+            clearTimeout(timeoutId);
+            
+            return "not_found";
 
-        body: JSON.stringify({ is_verified: true }),
+        }
 
-        signal: controller.signal,
+        if (currentData?.is_verified === true) {
 
-    });
+            clearTimeout(timeoutId);
 
-    clearTimeout(timeoutId);
+            return "already_verified";
 
-    return patchRes.ok ? "verified_now" : "error";
+        }
+
+        const patchRes = await fetch(url, {
+
+            method: "PATCH",
+
+            headers: {
+                
+                "Content-Type": "application/json"
+            
+            },
+
+            body: JSON.stringify({ is_verified: true }),
+
+            signal: controller.signal
+
+        });
+
+        clearTimeout(timeoutId);
+
+        return patchRes.ok ? "verified_now" : "error";
+
+    } catch (_err) {
+
+        clearTimeout(timeoutId);
+
+        return "error";
+
+    }
 
 }

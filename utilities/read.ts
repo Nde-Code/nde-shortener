@@ -20,6 +20,8 @@ export async function readInFirebaseRTDB<T>(FIREBASE_URL: string, path: string):
 
             },
 
+            signal: controller.signal
+
         });
 
         clearTimeout(timeoutId);
