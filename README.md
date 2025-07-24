@@ -14,6 +14,8 @@ A simple and lightweight URL shortener built with [Deno](https://deno.land/) and
 
 - No sign-up, no credit card, or other personal information required.
 
+- No logs are maintained to track user activity.
+
 - Highly configurable.
 
 - Generate short unique codes for URLs (avoid collisions).
