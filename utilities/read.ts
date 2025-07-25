@@ -4,7 +4,7 @@ export async function readInFirebaseRTDB<T>(FIREBASE_URL: string, path: string):
 
     const controller = new AbortController();
 
-    const timeoutId = setTimeout(() => controller.abort(), config.FIREBASE_TIMEOUT);
+    const timeoutId = setTimeout(() => controller.abort(), config.FIREBASE_TIMEOUT_MS);
 
     try {
 

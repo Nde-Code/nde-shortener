@@ -111,7 +111,7 @@ export const config: Config = {
 
   IPS_PURGE_TIME_DAYS: 1, // min: 1
 
-  FIREBASE_TIMEOUT: 6000, // min: 1000
+  FIREBASE_TIMEOUT_MS: 6000, // min: 1000
 
   FIREBASE_ENTRIES_LIMIT: 500, // min: 50
 
@@ -136,7 +136,7 @@ export const config: Config = {
 
 - **IPS_PURGE_TIME_DAYS** in [day]: The number of days before purging the `Deno.kv` store that contains hashed IPs used for rate limiting. Currently: 1 day.
 
-- **FIREBASE_TIMEOUT** in [millisecond]: The timeout limit for HTTP requests to the Firebase Realtime Database. Currently: 6 seconds.
+- **FIREBASE_TIMEOUT_MS** in [millisecond]: The timeout limit for HTTP requests to the Firebase Realtime Database. Currently: 6 seconds.
 
 - **FIREBASE_ENTRIES_LIMIT**: The maximum number of entries allowed in your Firebase Realtime Database. Currently: 500 entries.
 

@@ -6,7 +6,7 @@ export async function putInFirebaseRTDB<T = unknown, U = unknown>(FIREBASE_URL: 
 
     const controller: AbortController = new AbortController();
 
-    const timeoutId: number = setTimeout(() => controller.abort(), config.FIREBASE_TIMEOUT);
+    const timeoutId: number = setTimeout(() => controller.abort(), config.FIREBASE_TIMEOUT_MS);
 
     try {
 

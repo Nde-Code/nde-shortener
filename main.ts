@@ -34,7 +34,7 @@ async function handler(req: Request): Promise<Response> {
 
 		IPS_PURGE_TIME_DAYS: 1,
 
-		FIREBASE_TIMEOUT: 1000,
+		FIREBASE_TIMEOUT_MS: 1000,
 
 		FIREBASE_ENTRIES_LIMIT: 50,
 

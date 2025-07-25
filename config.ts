@@ -18,7 +18,7 @@ export const config: Config = {
 
     IPS_PURGE_TIME_DAYS: 1,
 
-    FIREBASE_TIMEOUT: 6000,
+    FIREBASE_TIMEOUT_MS: 6000,
 
     FIREBASE_ENTRIES_LIMIT: 500,
 

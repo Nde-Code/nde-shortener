@@ -18,7 +18,7 @@ export interface Config {
 
     IPS_PURGE_TIME_DAYS: number;
 
-    FIREBASE_TIMEOUT: number;
+    FIREBASE_TIMEOUT_MS: number;
 
     FIREBASE_ENTRIES_LIMIT: number;
 

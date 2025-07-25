@@ -8,7 +8,7 @@ export async function setIsVerifiedTrue(FIREBASE_URL: string, path: string): Pro
 
     const controller: AbortController = new AbortController();
     
-    const timeoutId: number = setTimeout(() => controller.abort(), config.FIREBASE_TIMEOUT);
+    const timeoutId: number = setTimeout(() => controller.abort(), config.FIREBASE_TIMEOUT_MS);
 
     try {
 
