@@ -2,9 +2,13 @@
 
 A simple and lightweight URL shortener built with [Deno](https://deno.land/) and [Firebase Realtime Database](https://firebase.google.com/products/realtime-database).
 
-> At the beginning, it was my first project using Deno to build a REST API. I kept adding features, and now I'm sharing it publicly on my GitHub.
+At the beginning, it was my first project using Deno to build a REST API. I kept adding features, and now I'm sharing it publicly on my GitHub.
 
-> I haven't picked a real name for the project yet, so I just called it: `nde-shortener`.
+I haven't picked a real name for the project yet, so I just called it: `nde-shortener`.
+
+**Public online instance:**
+
+> By using this software, whether hosted on your own server or through its public online instance, you confirm that you have read and accepted all the information provided in the [README.md](https://github.com/Nde-Code/nde-shortener/blob/main/README.md) and in [privacy.md](https://github.com/Nde-Code/nde-shortener/blob/main/privacy.md)
 
 ## 📦 Features:
 
@@ -241,4 +245,5 @@ When setup is complete, start the project with:
 deno task dev
 ```
 
-## 6. Enjoy !
+Everything should work as expected. If you encounter any issues, feel free to open an issue.
+ 
