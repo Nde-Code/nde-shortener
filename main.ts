@@ -160,25 +160,25 @@ async function handler(req: Request): Promise<Response> {
 
 		if (!data) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'INVALID_POST_BODY'), 400);
 
-		const satanizedURL: string = data.long_url.trim().toLowerCase();
+		const normalizedURL: string = data.long_url.trim().toLowerCase();
 
-		if (!satanizedURL) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'MISSING_LONG_URL_FIELD'), 400);
+		if (!normalizedURL) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'MISSING_LONG_URL_FIELD'), 400);
 
 		const keys = Object.keys(data as object);
 
 		if (keys.length !== 1 || keys[0] !== "long_url") return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'UNEXPECTED_FIELD_IN_BODY'), 400);
 
-		if (!isValidUrl(satanizedURL)) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'NOT_A_VALID_URL'), 400);
+		if (!isValidUrl(normalizedURL)) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'NOT_A_VALID_URL'), 400);
 
-		if (satanizedURL.length > config.MAX_URL_LENGTH) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'TOO_LONG_URL'), 400);
+		if (normalizedURL.length > config.MAX_URL_LENGTH) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'TOO_LONG_URL'), 400);
 
-		const urlKey: string = (await sha256(satanizedURL)).slice(0, config.SHORT_URL_ID_LENGTH);
+		const urlKey: string = (await sha256(normalizedURL)).slice(0, config.SHORT_URL_ID_LENGTH);
 
 		const existing: jsonURLFormat | null = await readInFirebaseRTDB<jsonURLFormat>(config.FIREBASE_URL, `/${config.FIREBASE_HIDDEN_PATH}/${urlKey}`);
 
 		if (existing) {
 
-			if (existing.long_url === satanizedURL) return createJsonResponse({ [translateKey(config.LANG_CODE, 'success')]: `${url.origin}/url/${urlKey}` }, 200);
+			if (existing.long_url === normalizedURL) return createJsonResponse({ [translateKey(config.LANG_CODE, 'success')]: `${url.origin}/url/${urlKey}` }, 200);
 				
 			else return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'HASH_COLLISION'), 500);
 			
@@ -192,7 +192,7 @@ async function handler(req: Request): Promise<Response> {
 
 		const firebaseData: jsonURLFormat = {
 
-			long_url: satanizedURL,
+			long_url: normalizedURL,
 
 			post_date: new Date().toISOString(),
 

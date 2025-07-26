@@ -35,7 +35,7 @@ The software uses third-party services to store data (used to shorten URLs). Thi
 You can read their privacy and terms here: [https://policies.google.com/privacy](https://policies.google.com/privacy) and [https://firebase.google.com/terms/](https://firebase.google.com/terms/)
 
 ## My Rights: 
-I reserve the right to completely delete the contents of the database at any time, without prior notice.
+I reserve the right to delete the contents of the database, any link(s), or other data at any time without prior notice.
 
 I also reserve the right to shut down the public instance or discontinue this project at any time.
 
