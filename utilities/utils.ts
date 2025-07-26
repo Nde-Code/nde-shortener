@@ -1,5 +1,3 @@
-import { createJsonResponse } from "./http_response.ts";
-
 import { Config } from "../types/types.ts";
 
 export function isConfigValidWithMinValues(config: Config, rules: Partial<Record<keyof Config, number>>): boolean {
@@ -16,15 +14,31 @@ export function isConfigValidWithMinValues(config: Config, rules: Partial<Record
 
 }
 
-export function extractValidID(path: string): string | Response {
+export function extractValidID(path: string): string | false {
 
-    const id: string = path.split("/")[2];
-    
-    if (!id) return createJsonResponse({ "error": "URL ID is missing." }, 400);
+	const parts: string[] = path.split("/").filter(Boolean);
 
-    else if (!/^[a-zA-Z0-9_-]{5,}$/.test(id)) return createJsonResponse({ error: "Invalid ID format." }, 400);
+	const id: string | undefined = parts[1];
 
-    else return id;
+	if (!id) return false;
+
+	if (!/^[a-zA-Z0-9_-]{5,}$/.test(id)) return false;
+
+	return id;
+
+}
+
+export function getApiKeyFromRequest(req: Request): string | null {
+
+    const authHeader: string | null = req.headers.get("authorization");
+
+    const xApiKey: string | null = req.headers.get("x-api-key");
+
+    if (authHeader?.startsWith("Bearer ")) return authHeader.slice(7).trim();
+        
+    else if (xApiKey) return xApiKey.trim();
+
+    return null;
 
 }
 

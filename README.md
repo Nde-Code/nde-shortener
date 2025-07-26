@@ -75,6 +75,14 @@ To use this **API endpoints** you can use:
 | **PATCH**    | `/verify/:code`    | Mark the URL as verified (`is_verified = true`). <br> **API/ADMIN key required** | *None*                                       | `200 OK`: Verified successfully / Already verified <br> `404 Not Found` <br> `401 Unauthorized`: Invalid API key                               |
 | **DELETE**    | `/delete/:code`    | Delete a shortened URL from the database. <br> **API/ADMIN key required**     | *None*                                       | `200 OK`: Link deleted <br> `404 Not Found` <br> `401 Unauthorized`: Invalid API key                                                           |
 
+### Authentication
+
+To access protected endpoints, you must include an API or ADMIN key in **the request headers** using one of the following:
+
+- `Authorization`: `<API/ADMIN key>`
+
+- `x-api-key`: `<API/ADMIN key>`
+
 ## 🚀 Getting Started:
 
 ### For those who want to create their own instance.

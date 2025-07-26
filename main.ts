@@ -8,7 +8,7 @@ import { setIsVerifiedTrue, VerificationStatus } from "./utilities/verify.ts";
 
 import { Config, jsonURLFormat, jsonURLMapOfFullDB, postBODYType } from "./types/types.ts";
 
-import { isConfigValidWithMinValues, extractValidID, isValidUrl, sha256, parseJsonBody } from "./utilities/utils.ts";
+import { isConfigValidWithMinValues, extractValidID, getApiKeyFromRequest, isValidUrl, sha256, parseJsonBody } from "./utilities/utils.ts";
 
 import { getIp, checkTimeRateLimit, checkDailyRateLimit, hashIp } from "./utilities/rate.ts";
 
@@ -74,7 +74,7 @@ async function handler(req: Request): Promise<Response> {
 
 	if (req.method === "GET" && pathname === "/urls") {
 
-		const apiKey: string | null = url.searchParams.get("apiKey");
+		const apiKey: string | null = getApiKeyFromRequest(req);
 
 		if (apiKey !== config.ADMIN_KEY) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'WRONG_API_KEY_FOR_URLS_DB'), 401);
 
@@ -92,9 +92,11 @@ async function handler(req: Request): Promise<Response> {
 
 	if (req.method === "PATCH" && pathname.startsWith("/verify/")) {
 
-		const ID: string | Response = extractValidID(pathname);
+		const ID: string | boolean = extractValidID(pathname);
 
-		const apiKey: string | null = url.searchParams.get("apiKey");
+		if (ID === false) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'NO_ID'), 400);
+
+		const apiKey: string | null = getApiKeyFromRequest(req);
 
 		if (apiKey !== config.ADMIN_KEY) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'WRONG_API_KEY_FOR_VERIFICATION'), 401);
 
@@ -110,9 +112,11 @@ async function handler(req: Request): Promise<Response> {
 
 	if (req.method === "DELETE" && pathname.startsWith("/delete/")) {
 
-		const ID: string | Response = extractValidID(pathname);
+		const ID: string | boolean = extractValidID(pathname);
+
+		if (ID === false) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'NO_ID'), 400);
 		
-		const apiKey: string | null = url.searchParams.get("apiKey");
+		const apiKey: string | null = getApiKeyFromRequest(req);
 
 		if (apiKey !== config.ADMIN_KEY) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'WRONG_API_KEY_FOR_DELETION'), 401);
 
@@ -130,7 +134,9 @@ async function handler(req: Request): Promise<Response> {
 
 	if (req.method === "GET" && pathname.startsWith("/url/")) {
 
-		const ID: string | Response = extractValidID(pathname);
+		const ID: string | boolean = extractValidID(pathname);
+
+		if (ID === false) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'NO_ID'), 400);
 
 		const data: jsonURLFormat | null = await readInFirebaseRTDB<jsonURLFormat>(config.FIREBASE_URL, `${config.FIREBASE_HIDDEN_PATH}/${ID}`);
 
