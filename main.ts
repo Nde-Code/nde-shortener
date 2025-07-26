@@ -12,7 +12,7 @@ import { isConfigValidWithMinValues, extractValidID, getApiKeyFromRequest, isVal
 
 import { getIp, checkTimeRateLimit, checkDailyRateLimit, hashIp } from "./utilities/rate.ts";
 
-import { createJsonResponse } from "./utilities/http_response.ts";
+import { createJsonResponse } from "./utilities/create_json.ts";
 
 import { config } from "./config.ts";
 
