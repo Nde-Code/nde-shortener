@@ -64,7 +64,7 @@ export const translations = {
 
             WRITE_LIMIT_EXCEEDED: "Rate limit exceeded: maximum of 10 write requests allowed per day.",
 
-            LINK_NOT_GENERATED: "Link could not be generated.",
+            LINK_NOT_GENERATED: "Link could not be generated. Retry again later...",
 
             INVALID_API_ENDPOINT: "The requested endpoint is invalid.",
 
@@ -126,7 +126,7 @@ export const translations = {
             
             WRITE_LIMIT_EXCEEDED: "Limite de requêtes dépassée: un maximum de 10 écritures par jour.",
            
-            LINK_NOT_GENERATED: "Le lien n'a pas pu être généré.",
+            LINK_NOT_GENERATED: "Le lien n'a pas pu être généré. Réessayez plus tard...",
             
             INVALID_API_ENDPOINT: "La terminaison demandée est invalide.",
 

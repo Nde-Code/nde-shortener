@@ -1,4 +1,4 @@
-import { putInFirebaseRTDB } from "./utilities/post.ts";
+import { putInFirebaseRTDB } from "./utilities/write.ts";
 
 import { readInFirebaseRTDB } from "./utilities/read.ts";
 
