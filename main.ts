@@ -90,7 +90,7 @@ async function handler(req: Request): Promise<Response> {
 
 	}
 
-	if (req.method === "GET" && pathname.startsWith("/verify/")) {
+	if (req.method === "PATCH" && pathname.startsWith("/verify/")) {
 
 		const ID: string | Response = extractValidID(pathname);
 
