@@ -58,6 +58,24 @@ export function isValidUrl(url: string): boolean {
     
 }
 
+export function normalizeURL(input: string): string | null {
+
+    try {
+
+        const url = new URL(input.trim());
+
+        url.hostname = url.hostname.toLowerCase(); 
+        
+        return url.toString(); 
+        
+    } catch {
+
+        return null;
+
+    }
+
+}
+
 export async function sha256(input: string): Promise<string> {
 
 	const encoder: TextEncoder = new TextEncoder();

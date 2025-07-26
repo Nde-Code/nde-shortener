@@ -8,7 +8,7 @@ import { setIsVerifiedTrue, VerificationStatus } from "./utilities/verify.ts";
 
 import { Config, jsonURLFormat, jsonURLMapOfFullDB, postBODYType } from "./types/types.ts";
 
-import { isConfigValidWithMinValues, extractValidID, getApiKeyFromRequest, isValidUrl, sha256, parseJsonBody } from "./utilities/utils.ts";
+import { isConfigValidWithMinValues, extractValidID, getApiKeyFromRequest, isValidUrl, normalizeURL, sha256, parseJsonBody } from "./utilities/utils.ts";
 
 import { getIp, checkTimeRateLimit, checkDailyRateLimit, hashIp } from "./utilities/rate.ts";
 
@@ -164,15 +164,15 @@ async function handler(req: Request): Promise<Response> {
 
 		const data: postBODYType | null = await parseJsonBody<postBODYType>(req);
 
-		if (!data) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'INVALID_POST_BODY'), 400);
-
-		const normalizedURL: string = data.long_url.trim().toLowerCase();
-
-		if (!normalizedURL) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'MISSING_LONG_URL_FIELD'), 400);
+		if (!data || typeof data.long_url !== "string" || !data.long_url.trim()) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'INVALID_POST_BODY'), 400);
 
 		const keys = Object.keys(data as object);
 
 		if (keys.length !== 1 || keys[0] !== "long_url") return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'UNEXPECTED_FIELD_IN_BODY'), 400);
+
+		const normalizedURL: string | null = normalizeURL(data.long_url);
+
+		if (!normalizedURL) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'MISSING_LONG_URL_FIELD'), 400);
 
 		if (!isValidUrl(normalizedURL)) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'NOT_A_VALID_URL'), 400);
 
