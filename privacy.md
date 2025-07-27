@@ -34,6 +34,22 @@ The software uses third-party services to store data (used to shorten URLs). Thi
 
 You can read their privacy and terms here: [https://policies.google.com/privacy](https://policies.google.com/privacy) and [https://firebase.google.com/terms/](https://firebase.google.com/terms/)
 
+## Link Submission Policy:
+
+This URL shortening service **only accepts links from legitimate and publicly accessible websites**.
+
+### Disallowed Links:
+
+- Links to local addresses (e.g., `localhost`, `127.0.0.1`, `::1`, etc.).
+
+- Links to invalid or malformed domains.
+
+- Links to internal, non-public services.
+
+- Links associated with malicious, fraudulent, or illegal content.
+
+Any link that does not meet these criteria will be **automatically deleted** without notice.
+
 ## My Rights: 
 I reserve the right to delete the contents of the database, any link(s), or other data at any time without prior notice.
 
