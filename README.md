@@ -79,9 +79,9 @@ To use this **API endpoints** you can use:
 
 To access protected endpoints, you must include an API or ADMIN key in **the request headers** using one of the following:
 
-- `Authorization`: `<API/ADMIN key>`
+- `Authorization: Bearer <API_or_ADMIN_KEY>`
 
-- `x-api-key`: `<API/ADMIN key>`
+- `x-api-key: <API_or_ADMIN_KEY>`
 
 ## 🚀 Getting Started:
 
