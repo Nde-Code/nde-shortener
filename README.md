@@ -8,6 +8,10 @@ I haven't picked a real name for the project yet, so I just called it: `nde-shor
 
 **Public online instance:**
 
+  - [https://nsh.deno.dev/](https://nsh.deno.dev/) *(Short-link friendly)*
+
+  - [https://nde-shortener-b597n4drffqv.deno.dev/](https://nde-shortener-b597n4drffqv.deno.dev/)
+
 > By using this software, whether hosted on your own server or through its public online instance, you confirm that you have read and accepted all the information provided in the [README.md](https://github.com/Nde-Code/nde-shortener/blob/main/README.md) and in [privacy.md](https://github.com/Nde-Code/nde-shortener/blob/main/privacy.md)
 
 ## 📦 Features:
