@@ -121,7 +121,7 @@ export const config: Config = {
     
   RATE_LIMIT_INTERVAL_S: 1, // min: 1
 
-  DAILY_LIMIT: 10, // min: 1
+  MAX_DAILY_WRITES: 10, // min: 1
 
   IPS_PURGE_TIME_DAYS: 1, // min: 1
 
@@ -146,7 +146,7 @@ export const config: Config = {
 
 - **RATE_LIMIT_INTERVAL_S** in [second]: This is the rate limit based on requests. Currently: one request per second.
 
-- **DAILY_LIMIT** in [day]: Posting rate limit per day. Currently: 10 writes per day.
+- **MAX_DAILY_WRITES** in [day]: Posting rate limit per day. Currently: 10 writes per day.
 
 - **IPS_PURGE_TIME_DAYS** in [day]: The number of days before purging the `Deno.kv` store that contains hashed IPs used for rate limiting. Currently: 1 day.
 

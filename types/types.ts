@@ -14,7 +14,7 @@ export interface Config {
     
     RATE_LIMIT_INTERVAL_S: number;
 
-    DAILY_LIMIT: number;
+    MAX_DAILY_WRITES: number;
 
     IPS_PURGE_TIME_DAYS: number;
 

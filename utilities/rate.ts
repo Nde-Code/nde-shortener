@@ -42,7 +42,7 @@ export async function checkDailyRateLimit(hashedIp: string): Promise<boolean> {
 
     }
 
-    if (entry.value.count >= config.DAILY_LIMIT) return false;
+    if (entry.value.count >= config.MAX_DAILY_WRITES) return false;
 
     entry.value.count++;
 

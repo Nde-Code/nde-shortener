@@ -30,7 +30,7 @@ async function handler(req: Request): Promise<Response> {
 
 		RATE_LIMIT_INTERVAL_S: 1,
 
-		DAILY_LIMIT: 1,
+		MAX_DAILY_WRITES: 1,
 
 		IPS_PURGE_TIME_DAYS: 1,
 
