@@ -55,7 +55,7 @@ I reserve the right to delete the contents of the database, any link(s), or othe
 
 I also reserve the right to shut down the public instance or discontinue this project at any time.
 
-## About My Online Instance with [Deno Deploy](https://deno.com/deploy)
+## About My Online Instance with [Deno Deploy](https://deno.com/deploy):
 
 Deno Deploy is a global, serverless platform used to host JavaScript and TypeScript applications.
 
