@@ -55,6 +55,17 @@ I reserve the right to delete the contents of the database, any link(s), or othe
 
 I also reserve the right to shut down the public instance or discontinue this project at any time.
 
+## About My Online Instance with [Deno Deploy](https://deno.com/deploy)
+
+Deno Deploy is a global, serverless platform used to host JavaScript and TypeScript applications.
+
+This instance is hosted using Deno Deploy (although you're free to run your own).  
+Please note that the hashed IP data stored in the KV database may transit and be stored **outside the European Union**, specifically in the **United States**.
+
+Even though IP addresses are hashed with a strong secret and automatically deleted every 24 hours, this data might be subject to processing in jurisdictions with different privacy laws.
+
+If you're concerned about this, consider self-hosting the project in an EU-only environment.
+
 ## Changes to This Privacy Policy:  
 I may update this Privacy Policy from time to time. You are advised to review this page periodically for any changes.
 
