@@ -36,7 +36,7 @@ export const translations = {
 
             NO_URLS_IN_DB: "Sorry no URL(s) to retreive from the database.",
 
-            NO_ID: "The request is missing a required ID parameter.",
+            NO_ID: "ID is missing, but it is a required parameter.",
 
             WRONG_API_KEY_FOR_VERIFICATION: "The API key provided for link verification is incorrect or missing.",
 
@@ -100,7 +100,7 @@ export const translations = {
 
             NO_URLS_IN_DB: "Désolé, aucune URL à récupérer depuis la base de données.",
 
-            NO_ID: "La requête ne contient pas le paramètre ID requis.",
+            NO_ID: "L'identifiant est manquant, mais il s'agit d'un paramètre requis.",
             
             WRONG_API_KEY_FOR_VERIFICATION: "La clé API fournie pour la vérification du lien est incorrecte ou manquante.",
             
