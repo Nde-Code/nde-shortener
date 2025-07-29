@@ -210,11 +210,13 @@ async function handler(req: Request): Promise<Response> {
 
 		const firebaseResponse: string | null = (result !== null && result.long_url === firebaseData.long_url && result.post_date === firebaseData.post_date && result.is_verified === firebaseData.is_verified) ? `${url.origin}/url/${urlKey}` : null;
 
-		if (firebaseResponse === null) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'LINK_NOT_GENERATED'), 500);
+		if (firebaseResponse === null) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'LINK_NOT_GENERATED'), 500);
 
 		else return createJsonResponse({ [translateKey(config.LANG_CODE, 'success')]: firebaseResponse }, 201);
 
 	}
+
+	if (req.method === "GET" && pathname === "/") return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'success', 'ROOT_API_URL'), 200)
 
 	return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'INVALID_API_ENDPOINT'), 404);
 
