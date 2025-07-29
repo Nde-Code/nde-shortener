@@ -46,7 +46,7 @@ export async function checkDailyRateLimit(hashedIp: string): Promise<boolean> {
 
     entry.value.count++;
 
-    await kv.set(key, entry.value, { expireIn: (config.IPS_PURGE_TIME_DAYS * 24 * 60 * 60 * 1000) });
+    await kv.set(key, entry.value);
 
     return true;
 
