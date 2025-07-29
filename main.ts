@@ -216,7 +216,7 @@ async function handler(req: Request): Promise<Response> {
 
 	}
 
-	if (req.method === "GET" && pathname === "/") return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'success', 'ROOT_API_URL'), 200)
+	if (req.method === "GET" && pathname === "/") return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'success', 'ROOT_URL_MESSAGE'), 200)
 
 	return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'INVALID_API_ENDPOINT'), 404);
 

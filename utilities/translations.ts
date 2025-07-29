@@ -68,7 +68,7 @@ export const translations = {
 
             LINK_NOT_GENERATED: "Link could not be generated. Retry again later...",
 
-            ROOT_API_URL: "Welcome to the API root. See https://github.com/Nde-Code/nde-shortener /README.md and /privacy.md for usage.",
+            ROOT_URL_MESSAGE: "Welcome to the API root. See https://github.com/Nde-Code/nde-shortener /README.md and /privacy.md for usage.",
 
             INVALID_API_ENDPOINT: "The requested endpoint is invalid.",
 
@@ -134,7 +134,7 @@ export const translations = {
            
             LINK_NOT_GENERATED: "Le lien n'a pas pu être généré. Réessayez plus tard...",
 
-            ROOT_API_URL: "Bienvenue à la racine de l'API. Consultez les fichiers README.md et privacy.md sur https://github.com/Nde-Code/nde-shortener.",
+            ROOT_URL_MESSAGE: "Bienvenue à la racine de l'API. Consultez les fichiers README.md et privacy.md sur https://github.com/Nde-Code/nde-shortener.",
             
             INVALID_API_ENDPOINT: "La terminaison demandée est invalide.",
 
