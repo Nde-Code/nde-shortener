@@ -1,6 +1,6 @@
-# 🔗 Deno URL Shortener with Firebase RTDB:
+# 🔗 Deno URL Shortener API with Firebase RTDB:
 
-A simple and lightweight URL shortener built with [Deno](https://deno.land/) and [Firebase Realtime Database](https://firebase.google.com/products/realtime-database).
+A simple and lightweight URL shortener API built with [Deno](https://deno.land/) and [Firebase Realtime Database](https://firebase.google.com/products/realtime-database).
 
 At the beginning, it was my first project using Deno to build a REST API. I kept adding features, and now I'm sharing it publicly on my GitHub.
 
