@@ -54,23 +54,25 @@ async function handler(req: Request): Promise<Response> {
 
 	if (req.method === "OPTIONS") {
 
-		return createJsonResponse({},
-		
-			204,
+		return new Response(null, {
 
-			{
+			status: 204,
 
-				"Access-Control-Allow-Methods": "GET, DELETE, POST, OPTIONS",
+			headers: {
 
-				"Access-Control-Allow-Headers": "Content-Type, Authorization",
+				"Access-Control-Allow-Origin": "*",
 
-				"Access-Control-Max-Age": "86400",
+				"Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
+
+				"Access-Control-Allow-Headers": "Content-Type",
+
+				"Access-Control-Max-Age": "86400"
 
 			}
+
+		});
 		
-		);
-		
-  	}
+	}
 
 	if (req.method === "GET" && pathname === "/urls") {
 
