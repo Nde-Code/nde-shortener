@@ -50,8 +50,6 @@ async function handler(req: Request): Promise<Response> {
 
 	if (!hashedIP || hashedIP.length !== 64) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'WRONG_HASH'), 403);
 
-	if (!(await checkTimeRateLimit(hashedIP))) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'RATE_LIMIT_EXCEEDED'), 429);
-
 	if (req.method === "OPTIONS") {
 
 		return new Response(null, {
@@ -76,6 +74,8 @@ async function handler(req: Request): Promise<Response> {
 
 	if (req.method === "GET" && pathname === "/urls") {
 
+		if (!(await checkTimeRateLimit(hashedIP))) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'RATE_LIMIT_EXCEEDED'), 429);
+
 		const apiKey: string | null = getApiKeyFromRequest(req);
 
 		if (apiKey !== config.ADMIN_KEY) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'WRONG_API_KEY_FOR_URLS_DB'), 401);
@@ -93,6 +93,8 @@ async function handler(req: Request): Promise<Response> {
 	}
 
 	if (req.method === "PATCH" && pathname.startsWith("/verify/")) {
+
+		if (!(await checkTimeRateLimit(hashedIP))) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'RATE_LIMIT_EXCEEDED'), 429);
 
 		const ID: string | boolean = extractValidID(pathname);
 
@@ -113,6 +115,8 @@ async function handler(req: Request): Promise<Response> {
 	}
 
 	if (req.method === "DELETE" && pathname.startsWith("/delete/")) {
+
+		if (!(await checkTimeRateLimit(hashedIP))) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'RATE_LIMIT_EXCEEDED'), 429);
 
 		const ID: string | boolean = extractValidID(pathname);
 
@@ -135,6 +139,8 @@ async function handler(req: Request): Promise<Response> {
 	}
 
 	if (req.method === "GET" && pathname.startsWith("/url/")) {
+
+		if (!(await checkTimeRateLimit(hashedIP))) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'RATE_LIMIT_EXCEEDED'), 429);
 
 		const ID: string | boolean = extractValidID(pathname);
 
@@ -163,6 +169,10 @@ async function handler(req: Request): Promise<Response> {
 	}
 
   	if (req.method === "POST" && pathname === "/post-url") {
+
+		if (!(await checkTimeRateLimit(hashedIP))) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'RATE_LIMIT_EXCEEDED'), 429);
+
+		if (!(await checkDailyRateLimit(hashedIP))) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'WRITE_LIMIT_EXCEEDED'), 429);
 
 		const data: postBODYType | null = await parseJsonBody<postBODYType>(req);
 
@@ -195,8 +205,6 @@ async function handler(req: Request): Promise<Response> {
 		const completeDB: jsonURLMapOfFullDB | null = await readInFirebaseRTDB<jsonURLMapOfFullDB>(config.FIREBASE_URL, config.FIREBASE_HIDDEN_PATH);
 		
 		if (completeDB && Object.keys(completeDB).length > config.FIREBASE_ENTRIES_LIMIT) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'DB_LIMIT_REACHED'), 507);
-
-		if (!(await checkDailyRateLimit(hashedIP))) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'WRITE_LIMIT_EXCEEDED'), 429);
 
 		const firebaseData: jsonURLFormat = {
 
