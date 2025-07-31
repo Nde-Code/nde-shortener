@@ -64,7 +64,7 @@ export const translations = {
 
             DB_LIMIT_REACHED: "The database has reached the limit of entries.",
 
-            WRITE_LIMIT_EXCEEDED: "Rate limit exceeded: maximum of 10 write requests allowed per day.",
+            WRITE_LIMIT_EXCEEDED: `Rate limit exceeded: maximum of ${config.MAX_DAILY_WRITES} write request(s) allowed per day.`,
 
             LINK_NOT_GENERATED: "Link could not be generated. Retry again later...",
 
@@ -130,7 +130,7 @@ export const translations = {
             
             DB_LIMIT_REACHED: "La base de données a atteint sa limite d'entrées.",
             
-            WRITE_LIMIT_EXCEEDED: "Limite de requêtes dépassée: un maximum de 10 écritures par jour.",
+            WRITE_LIMIT_EXCEEDED: `Limite de requêtes dépassée: maximum de ${config.MAX_DAILY_WRITES} écriture(s) par jour.`,
            
             LINK_NOT_GENERATED: "Le lien n'a pas pu être généré. Réessayez plus tard...",
 
