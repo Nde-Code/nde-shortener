@@ -24,7 +24,7 @@ The IP is **never stored in any external database** or service. The `kv` databas
 
 The **hashed IP** is the **only personal information** used by this project, and it's solely for security and abuse-prevention purposes. While fingerprinting could also be used, this project aims to remain as **privacy-friendly** as possible.
 
-You can check the `rate.ts` file if you want to see how it works.
+You can check the [rate.ts](utilities/rate.ts) file if you want to see how it works.
 
 ## Cookies: 
 **No cookies**, **no analytics**, **no logs**, or **any other** data is collected by the project.
