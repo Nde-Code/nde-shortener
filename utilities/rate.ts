@@ -2,8 +2,6 @@ import { config } from "../config.ts";
 
 const kv = await Deno.openKv();
 
-function getTodayDate(): string { return new Date().toISOString().slice(0, 10); }
-
 export function getIp(req: Request): string {
 
     return (req.headers.get("x-forwarded-for") || req.headers.get("forwarded") || "unknown");
@@ -14,7 +12,7 @@ export async function checkTimeRateLimit(hashedIp: string): Promise<boolean> {
 
     const now: number = Date.now();
 
-    const key: string[] = ["ipTimestamps", hashedIp];
+    const key: string[] = ["ipTimestamp", hashedIp];
 
     const entry: Deno.KvEntryMaybe<number> = await kv.get<number>(key);
 
