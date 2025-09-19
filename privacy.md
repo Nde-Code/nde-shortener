@@ -6,17 +6,7 @@ To be clear and transparent about what data this software uses and how it is han
 ## Information Collection and Use: 
 ### Rate limiting, Privacy and Security:
 
-To implement a `rate limiting` system, this software works with your IP address. The IP is retrieved via:
-
-```ts
-export function getIp(req: Request): string {
-  return (
-    req.headers.get("x-forwarded-for") ||
-    req.headers.get("forwarded") ||
-    "unknown"
-  );
-}
-```
+To implement a `rate limiting` system, this software works with your IP address. 
 
 However, the IP is immediately hashed using `SHA-256`, combined with a `SALT` key (strong, secret, and secure) stored in the `.env` file. Your IP is **never logged** anywhere and is only stored in a memory database called [Deno KV](https://docs.deno.com/api/deno/~/Deno.Kv). This allows the software to retain information in memory, even if the project is restarted (e.g., due to a `Cold Start` on [Deno Deploy](https://deno.com/deploy)).
 

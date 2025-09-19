@@ -80,7 +80,7 @@ export async function sha256(input: string): Promise<string> {
 
 	const encoder: TextEncoder = new TextEncoder();
 
-	const data: Uint8Array<ArrayBufferLike> = encoder.encode(input);
+	const data = encoder.encode(input);
 
 	const hashBuffer: ArrayBuffer = await crypto.subtle.digest("SHA-256", data);
 

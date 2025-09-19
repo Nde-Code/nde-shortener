@@ -2,12 +2,6 @@ import { config } from "../config.ts";
 
 const kv = await Deno.openKv();
 
-export function getIp(req: Request): string {
-
-    return (req.headers.get("x-forwarded-for") || req.headers.get("forwarded") || "unknown");
-
-}
-
 export async function checkTimeRateLimit(hashedIp: string): Promise<boolean> {
 
     const now: number = Date.now();
@@ -68,7 +62,7 @@ export async function hashIp(ip: string, salt = config.HASH_KEY): Promise<string
 
     const encoder: TextEncoder = new TextEncoder();
 
-    const data: Uint8Array<ArrayBufferLike> = encoder.encode(ip + salt);
+    const data = encoder.encode(ip + salt);
 
     const hashBuffer: ArrayBuffer = await crypto.subtle.digest("SHA-256", data);
     

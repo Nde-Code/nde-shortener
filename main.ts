@@ -10,7 +10,7 @@ import { Config, jsonURLFormat, jsonURLMapOfFullDB, postBODYType } from "./types
 
 import { isConfigValidWithMinValues, extractValidID, getApiKeyFromRequest, isValidUrl, normalizeURL, sha256, parseJsonBody } from "./utilities/utils.ts";
 
-import { getIp, checkTimeRateLimit, checkDailyRateLimit, hashIp } from "./utilities/rate.ts";
+import { checkTimeRateLimit, checkDailyRateLimit, hashIp } from "./utilities/rate.ts";
 
 import { createJsonResponse } from "./utilities/create_json.ts";
 
@@ -18,13 +18,15 @@ import { config } from "./config.ts";
 
 import { buildLocalizedMessage, translateKey } from "./utilities/translations.ts";
 
-async function handler(req: Request): Promise<Response> {
+async function handler(req: Request, connInfo: Deno.ServeHandlerInfo): Promise<Response> {
 
 	const url: URL = new URL(req.url);
 
 	const pathname: string = url.pathname;
 
-	const hashedIP: string = await hashIp(getIp(req));
+	const ip: string = (connInfo.remoteAddr.transport === "tcp") ? connInfo.remoteAddr.hostname : "unknown";
+
+	const hashedIP: string = await hashIp(ip);
 
 	const configMinValues: Partial<Record<keyof Config, number>> = {
 
