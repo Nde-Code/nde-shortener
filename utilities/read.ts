@@ -1,6 +1,8 @@
 import { config } from "../config.ts";
 
-export async function readInFirebaseRTDB<T>(FIREBASE_URL: string, path: string): Promise<T | null> {
+import { printLogLine } from "./utils.ts";
+
+export async function readInFirebaseRTDB<T>(FIREBASE_URL: string, ID?: string): Promise<T | null> {
 
     const controller = new AbortController();
 
@@ -8,7 +10,7 @@ export async function readInFirebaseRTDB<T>(FIREBASE_URL: string, path: string):
 
     try {
 
-        const url: string = `${FIREBASE_URL}${path}.json`;
+        const url: string = `${FIREBASE_URL}${(ID === undefined) ? config.FIREBASE_HIDDEN_PATH : (config.FIREBASE_HIDDEN_PATH + '/' + ID)}.json`;
 
         const res: Response = await fetch(url, {
 
@@ -35,6 +37,8 @@ export async function readInFirebaseRTDB<T>(FIREBASE_URL: string, path: string):
     } catch (_err) {
 
         clearTimeout(timeoutId);
+
+        printLogLine("ERROR", `An error happened when reading ${(ID === undefined) ? "URLs" : `the link(${ID})`}.`);
 
         return null;
 

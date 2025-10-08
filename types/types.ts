@@ -28,7 +28,7 @@ export interface Config {
 
 }
 
-export interface jsonURLFormat {
+export interface LinkDetails {
 
 	long_url: string
 
@@ -38,6 +38,6 @@ export interface jsonURLFormat {
 
 }
 
-export type postBODYType = { long_url: string };
+export type UrlPostBody = { long_url: string };
 
-export type jsonURLMapOfFullDB = Record<string, { long_url: string; post_date: string, is_verified: boolean }>;
+export type UrlDatabaseMap = Record<string, { long_url: string; post_date: string, is_verified: boolean }>;

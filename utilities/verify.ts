@@ -1,10 +1,12 @@
 import { config } from "../config.ts";
 
+import { printLogLine } from "./utils.ts";
+
 export type VerificationStatus = "already_verified" | "verified_now" | "not_found" | "error";
 
-export async function setIsVerifiedTrue(FIREBASE_URL: string, path: string): Promise<VerificationStatus> {
+export async function setIsVerifiedTrue(FIREBASE_URL: string, ID: string): Promise<VerificationStatus> {
 
-    const url: string = `${FIREBASE_URL}${path}.json`;
+    const url: string = `${FIREBASE_URL}${config.FIREBASE_HIDDEN_PATH}/${ID}.json`;
 
     const controller: AbortController = new AbortController();
     
@@ -58,11 +60,15 @@ export async function setIsVerifiedTrue(FIREBASE_URL: string, path: string): Pro
 
         clearTimeout(timeoutId);
 
+        printLogLine("INFO", `The link(${ID}) has been verified successfully.`);
+
         return patchRes.ok ? "verified_now" : "error";
 
     } catch (_err) {
 
         clearTimeout(timeoutId);
+
+        printLogLine("ERROR", `An error heppened when verifying the link(${ID}).`);
 
         return "error";
 

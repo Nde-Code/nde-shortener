@@ -1,8 +1,10 @@
 import { config } from "../config.ts";
 
-export async function deleteInFirebaseRTDB(FIREBASE_URL: string, path: string): Promise<boolean> {
+import { printLogLine } from "./utils.ts";
 
-    const url = `${FIREBASE_URL}${path}.json`;
+export async function deleteInFirebaseRTDB(FIREBASE_URL: string, ID: string): Promise<boolean> {
+
+    const url = `${FIREBASE_URL}${config.FIREBASE_HIDDEN_PATH}/${ID}.json`;
 
     const controller = new AbortController();
 
@@ -18,9 +20,13 @@ export async function deleteInFirebaseRTDB(FIREBASE_URL: string, path: string): 
 
         });
 
+        printLogLine("INFO", `The link(${ID}) has been deleted successfully.`);
+
         return res.ok;
 
     } catch (_err) {
+
+        printLogLine("ERROR", `An error heppened when deleting the link(${ID}).`);
 
         return false;
 

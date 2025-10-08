@@ -6,9 +6,25 @@ import { deleteInFirebaseRTDB } from "./utilities/delete.ts";
 
 import { setIsVerifiedTrue, VerificationStatus } from "./utilities/verify.ts";
 
-import { Config, jsonURLFormat, jsonURLMapOfFullDB, postBODYType } from "./types/types.ts";
+import { Config, LinkDetails, UrlPostBody, UrlDatabaseMap } from "./types/types.ts";
 
-import { isConfigValidWithMinValues, extractValidID, getApiKeyFromRequest, isValidUrl, normalizeURL, sha256, parseJsonBody } from "./utilities/utils.ts";
+import {
+	
+	isConfigValidWithMinValues,
+	
+	extractValidID,
+	
+	getApiKeyFromRequest,
+	
+	isValidUrl,
+	
+	normalizeURL,
+	
+	sha256,
+	
+	parseJsonBody
+
+} from "./utilities/utils.ts";
 
 import { checkTimeRateLimit, checkDailyRateLimit, hashIp } from "./utilities/rate.ts";
 
@@ -84,7 +100,7 @@ async function handler(req: Request, connInfo: Deno.ServeHandlerInfo): Promise<R
 
 		else {
 
-			const data: jsonURLFormat | null = await readInFirebaseRTDB<jsonURLFormat>(config.FIREBASE_URL, config.FIREBASE_HIDDEN_PATH);
+			const data: LinkDetails | null = await readInFirebaseRTDB<LinkDetails>(config.FIREBASE_URL);
 	
 			if (!data) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'NO_URLS_IN_DB'), 200);
 	
@@ -106,7 +122,7 @@ async function handler(req: Request, connInfo: Deno.ServeHandlerInfo): Promise<R
 
 		if (apiKey !== config.ADMIN_KEY) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'WRONG_API_KEY_FOR_VERIFICATION'), 401);
 
-		const result: VerificationStatus = await setIsVerifiedTrue(config.FIREBASE_URL, `${config.FIREBASE_HIDDEN_PATH}/${ID}`);
+		const result: VerificationStatus = await setIsVerifiedTrue(config.FIREBASE_URL, ID);
 
 		if (result === "verified_now") return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'success', 'LINK_VERIFIED'), 200);	
 
@@ -130,7 +146,7 @@ async function handler(req: Request, connInfo: Deno.ServeHandlerInfo): Promise<R
 
 		else {
 
-			const data: boolean  = await deleteInFirebaseRTDB(config.FIREBASE_URL, `${config.FIREBASE_HIDDEN_PATH}/${ID}`);
+			const data: boolean  = await deleteInFirebaseRTDB(config.FIREBASE_URL, ID);
 
 			if (data === true) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'success', 'LINK_DELETED'), 200)
 			
@@ -148,7 +164,7 @@ async function handler(req: Request, connInfo: Deno.ServeHandlerInfo): Promise<R
 
 		if (ID === false) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'NO_ID'), 400);
 
-		const data: jsonURLFormat | null = await readInFirebaseRTDB<jsonURLFormat>(config.FIREBASE_URL, `${config.FIREBASE_HIDDEN_PATH}/${ID}`);
+		const data: LinkDetails | null = await readInFirebaseRTDB<LinkDetails>(config.FIREBASE_URL, ID);
 
 		if (data && data !== null) {
 
@@ -174,7 +190,7 @@ async function handler(req: Request, connInfo: Deno.ServeHandlerInfo): Promise<R
 
 		if (!(await checkTimeRateLimit(hashedIP))) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'RATE_LIMIT_EXCEEDED'), 429);
 
-		const data: postBODYType | null = await parseJsonBody<postBODYType>(req);
+		const data: UrlPostBody | null = await parseJsonBody<UrlPostBody>(req);
 
 		if (!data || typeof data.long_url !== "string" || !data.long_url.trim()) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'INVALID_POST_BODY'), 400);
 
@@ -192,7 +208,7 @@ async function handler(req: Request, connInfo: Deno.ServeHandlerInfo): Promise<R
 
 		const urlKey: string = (await sha256(normalizedURL)).slice(0, config.SHORT_URL_ID_LENGTH);
 
-		const existing: jsonURLFormat | null = await readInFirebaseRTDB<jsonURLFormat>(config.FIREBASE_URL, `/${config.FIREBASE_HIDDEN_PATH}/${urlKey}`);
+		const existing: LinkDetails | null = await readInFirebaseRTDB<LinkDetails>(config.FIREBASE_URL, urlKey);
 
 		if (existing) {
 
@@ -202,13 +218,13 @@ async function handler(req: Request, connInfo: Deno.ServeHandlerInfo): Promise<R
 			
 		}
 
-		const completeDB: jsonURLMapOfFullDB | null = await readInFirebaseRTDB<jsonURLMapOfFullDB>(config.FIREBASE_URL, config.FIREBASE_HIDDEN_PATH);
+		const completeDB: UrlDatabaseMap | null = await readInFirebaseRTDB<UrlDatabaseMap>(config.FIREBASE_URL);
 		
 		if (completeDB && Object.keys(completeDB).length > config.FIREBASE_ENTRIES_LIMIT) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'DB_LIMIT_REACHED'), 507);
 
 		if (!(await checkDailyRateLimit(hashedIP))) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'WRITE_LIMIT_EXCEEDED'), 429);
 
-		const firebaseData: jsonURLFormat = {
+		const firebaseData: LinkDetails = {
 
 			long_url: normalizedURL,
 
@@ -218,7 +234,7 @@ async function handler(req: Request, connInfo: Deno.ServeHandlerInfo): Promise<R
 
 		};
 
-		const result: jsonURLFormat | null = await putInFirebaseRTDB<jsonURLFormat, jsonURLFormat>(config.FIREBASE_URL, `/${config.FIREBASE_HIDDEN_PATH}/${urlKey}`, firebaseData);
+		const result: LinkDetails | null = await putInFirebaseRTDB<LinkDetails, LinkDetails>(config.FIREBASE_URL, urlKey, firebaseData);
 
 		const firebaseResponse: string | null = (result !== null && result.long_url === firebaseData.long_url && result.post_date === firebaseData.post_date && result.is_verified === firebaseData.is_verified) ? `${url.origin}/url/${urlKey}` : null;
 
