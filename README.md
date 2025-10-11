@@ -173,7 +173,7 @@ wrangler types
 
 and put in the `tsconfig.json`: 
 
-> Already done, if you've cloned the project, you don't need to do that.
+> already done, if you've cloned the project so you don't need to do that.
 
 ```json
 {
@@ -197,15 +197,13 @@ and put in the `tsconfig.json`:
 
 this is the minimum TypeScript configuration required to make the project work.
 
-> If you've cloned the project, you don't need to do that.
-
 ⚠️ **Note:** When you’ve configured environment variables, this command may sometimes include your secrets directly in the generated type file. Be very careful, so always review this file (`worker-configuration.d.ts`) before committing or sharing your code. (1)
 
 ## Replacing `Deno.*` in the Original Code:
 
 Let's briefly summarize how the code was adapted for compatibility with Cloudflare Workers.
 
-1. The `.serve()` method needs to be replaced:
+- 1. The `.serve()` method needs to be replaced:
 ```ts
 Deno.serve(handler);
 ```
@@ -290,6 +288,6 @@ wrangler deploy
 
 and your project is now deployed and accessible to anyone with the link.
 
-# ✅ To finish:
+# 🧩 To finish:
 
 If you encounter any issues or problems, feel free top open an issue: [https://github.com/Nde-Code/nde-shortener/issues](https://github.com/Nde-Code/nde-shortener/issues)
