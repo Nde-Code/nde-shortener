@@ -1,4 +1,4 @@
-# 🛠️ A Cloudflare Workers-compatible version of the project
+# 🛠️ A Cloudflare Workers-compatible version of the project:
 
 This branch contains source code compatible with Cloudflare Workers.
 
