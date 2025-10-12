@@ -1,12 +1,8 @@
-# 🔗 Deno URL Shortener API with Firebase RTDB:
+# 🔗 URL Shortener API with Firebase RTDB:
 
-A simple and lightweight URL shortener API built with [Deno](https://deno.land/) and [Firebase Realtime Database](https://firebase.google.com/products/realtime-database).
-
-At the beginning, it was my first project using Deno to build a REST API. I kept adding features, and now I'm sharing it publicly on my GitHub.
+A simple and lightweight URL shortener API built with [Deno](https://deno.land/)/[Wrangler](https://developers.cloudflare.com/workers/wrangler/) and [Firebase Realtime Database](https://firebase.google.com/products/realtime-database).
 
 I haven't picked a real name for the project yet, so I just called it: `nde-shortener`.
-
-> By using this software, whether hosted on your own server or through its public online instance, you confirm that you have read and accepted all the information provided in the [README.md](https://github.com/Nde-Code/nde-shortener/blob/main/README.md) and in [privacy.md](https://github.com/Nde-Code/nde-shortener/blob/main/privacy.md)
 
 ## 📦 Features:
 
@@ -55,6 +51,24 @@ This project is designed with **GDPR compliance** in mind:
 This ensures that no identifiable user data is collected, stored, or shared in any form.
 
 ## 🌐 API Endpoints:
+
+The API is available in two versions, each with its own usage details:
+
+### Deno version:
+
+- *No public online instance is currently available.*
+- Rate limit: 1 request per second, with a maximum of 10 POST requests per day.
+- Admin endpoints (`/urls`, `/delete/:code`, `/verify/:code`) are limited to 1 request per second.
+- Privacy policy: [privacy.md](privacy.md)
+- Source code: [GitHub repository](https://github.com/Nde-Code/nde-shortener)
+
+### Cloudflare Workers version:
+
+- Public endpoint: [https://nsh.nde-code.workers.dev/](https://nsh.nde-code.workers.dev/)
+- Rate limit: 1 request per minute, with a maximum of 10 POST requests per day.
+- Admin endpoint (`/urls`) is limited to 1 request per minute; other admin endpoints are not subject to rate limiting.
+- Privacy policy: [privacy.md (cf-workers branch)](https://github.com/Nde-Code/nde-shortener/blob/cf-workers/privacy.md)
+- Source code: [GitHub repository (cf-workers branch)](https://github.com/Nde-Code/nde-shortener/tree/cf-workers)
 
 To use this **API endpoints** you can use:
 
