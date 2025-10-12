@@ -257,7 +257,7 @@ With:
 
 - **ADMIN_KEY**: An administrative key that grants the owner permission to `delete` and `verify` links.
 
-## 5. Run the project:
+## ▶️ In the end, run the project:
 
 When setup is complete, start the project with:
 
