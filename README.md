@@ -122,7 +122,7 @@ Create a Workers KV via the dashboard or using:
 wrangler kv namespace create YOUR_KV_NAME
 ```
 
-> To create a KV follow: [https://developers.cloudflare.com/kv/get-started/](https://developers.cloudflare.com/kv/get-started/)
+> If you feel stuck, take a look at: [https://developers.cloudflare.com/kv/get-started/](https://developers.cloudflare.com/kv/get-started/)
 
 And complete the `wrangler.jsonc` file with the following configuration:
 
@@ -219,7 +219,7 @@ export default {
 
 };
 ```
-- 2. Create a Env type (see (1) to understand why):
+- 2. Create an `Env` type (see point 1 to understand why we define our own type):
 ```ts
  export interface Env {
 
