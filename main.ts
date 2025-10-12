@@ -120,8 +120,6 @@ async function handler(req: Request, env: Env): Promise<Response> {
 
 	if (req.method === "PATCH" && pathname.startsWith("/verify/")) {
 
-		//if (!(await checkTimeRateLimit(env.RATE_LIMIT_KV, hashedIP))) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'RATE_LIMIT_EXCEEDED'), 429);
-
 		const ID: string | boolean = extractValidID(pathname);
 
 		if (ID === false) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'NO_ID'), 400);
@@ -141,8 +139,6 @@ async function handler(req: Request, env: Env): Promise<Response> {
 	}
 
 	if (req.method === "DELETE" && pathname.startsWith("/delete/")) {
-
-		//if (!(await checkTimeRateLimit(env.RATE_LIMIT_KV, hashedIP))) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'RATE_LIMIT_EXCEEDED'), 429);
 
 		const ID: string | boolean = extractValidID(pathname);
 
