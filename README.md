@@ -57,7 +57,7 @@ The API is available in two versions, each with its own usage details:
 ### Deno version:
 
 - *No public online instance is currently available.*
-- Rate limit: 1 request per second, with a maximum of 10 POST requests per day.
+- Rate limit: 1 request per second, with a daily cap of 10 new links added to the database.
 - Admin endpoints (`/urls`, `/delete/:code`, `/verify/:code`) are limited to 1 request per second.
 - Privacy policy: [privacy.md](privacy.md)
 - Source code: [GitHub repository](https://github.com/Nde-Code/nde-shortener)
