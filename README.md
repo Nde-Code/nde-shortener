@@ -65,7 +65,7 @@ The API is available in two versions, each with its own usage details:
 ### Cloudflare Workers version:
 
 - Public endpoint: [https://nsh.nde-code.workers.dev/](https://nsh.nde-code.workers.dev/)
-- Rate limit: 1 request per minute, with a maximum of 10 POST requests per day.
+- Rate limit: 1 request per minute, with a daily cap of 10 new links added to the database.
 - Admin endpoint (`/urls`) is limited to 1 request per minute; other admin endpoints are not subject to rate limiting.
 - Privacy policy: [privacy.md (cf-workers branch)](https://github.com/Nde-Code/nde-shortener/blob/cf-workers/privacy.md)
 - Source code: [GitHub repository (cf-workers branch)](https://github.com/Nde-Code/nde-shortener/tree/cf-workers)
