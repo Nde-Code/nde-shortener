@@ -26,8 +26,6 @@ I haven't picked a real name for the project yet, so I just called it: `nde-shor
 
 - Multi-language support for response messages.
 
-- Written in TypeScript with Deno runtime.
-
 - `verify` and `delete` actions implemented.
 
 ## 🛡 GDPR Compliance:
@@ -42,7 +40,7 @@ This project is designed with **GDPR compliance** in mind:
 
   - Hashing is done using `SHA-256`, combined with a strong, secret **salt**.
 
-  - Hashes are used **only in-memory** with [Deno KV](https://docs.deno.com/api/deno/~/Deno.Kv), not persisted or stored in any external database.
+  - Hashes are stored only in an in-memory persistent database, typically referred to as a key-value store.
 
   - IP hashes are automatically deleted after a configurable retention period (`IPS_PURGE_TIME_DAYS`). A duration of 24 hours is recommended for GDPR compliance.  
 
@@ -97,7 +95,7 @@ To access protected endpoints, you must include an API or ADMIN key in **the req
 
 ## 🚀 Getting Started:
 
-### For those who want to create their own instance.
+### For those who want to create their own instance (using Deno).
 
 ### 1. Install deno, clone the project and go in the folder:
 
