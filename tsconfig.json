@@ -12,6 +12,6 @@
     "forceConsistentCasingInFileNames": true,
     "types": ["./worker-configuration.d.ts"]
   },
-  "include": ["src", "utilities", "worker-configuration.d.ts"],
+  "include": ["utilities", "worker-configuration.d.ts", "main.ts", "config.ts", "types"],
   "exclude": ["node_modules", "dist"]
 }

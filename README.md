@@ -44,6 +44,8 @@ First, create the `wrangler.jsonc` file, which contains the full configuration f
 
 	"compatibility_date": "2025-10-08",
 
+	"preview_urls": false,
+
 	"observability": {
 
 		"enabled": true,
@@ -90,12 +92,16 @@ This determines the public URL for your Worker on Cloudflare (for example:
 ### **`main`**
 
 Specifies the **entry point** of your Worker script.
-This is the file that exports your main fetch handler — for example, `main.ts` or `index.js`.
+This is the file that exports your main fetch handler.
 
 ### **`compatibility_date`**
 
 Locks your Worker to a specific version of the Cloudflare Workers runtime.
 This ensures your code continues to work as expected, even if Cloudflare updates the runtime.
+
+### **`preview_urls`**
+
+It’s used to create a previewable URL. That’s a feature in Cloudflare Workers, but it’s not really useful for a small project. Feel free to take a look at: (https://developers.cloudflare.com/workers/configuration/previews/)[https://developers.cloudflare.com/workers/configuration/previews/]
 
 ## Observability:
 
@@ -171,6 +177,8 @@ To benefit from TypeScript definitions in your editor and avoid compilation erro
 wrangler types
 ```
 
+> Be sure that your `wrangler.jsonc` is correctly configured before running this command.
+
 and put in the `tsconfig.json`: 
 
 > already done, if you've cloned the project so you don't need to do that.
@@ -190,14 +198,16 @@ and put in the `tsconfig.json`:
     "forceConsistentCasingInFileNames": true,
     "types": ["./worker-configuration.d.ts"]
   },
-  "include": ["src", "utilities", "worker-configuration.d.ts"],
+  "include": ["utilities", "worker-configuration.d.ts", "main.ts", "config.ts", "types"],
   "exclude": ["node_modules", "dist"]
 }
 ```
 
 this is the minimum TypeScript configuration required to make the project work.
 
-⚠️ **Note:** When you’ve configured environment variables, this command may sometimes include your secrets directly in the generated type file. Be very careful, so always review this file (`worker-configuration.d.ts`) before committing or sharing your code. (1)
+⚠️ **Note:** When you’ve configured environment variables, this command may sometimes include your secrets directly in the generated type file. Be very careful, so always review this file (`worker-configuration.d.ts`) before committing or sharing your code. This file has been added to `.gitignore` and is excluded from the source tree in VS Code by default. (1)
+
+This project doesn't rely on any external libraries or dependencies, so there's no `package.json` or npm-related files.
 
 ## Replacing `Deno.*` in the Original Code:
 
