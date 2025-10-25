@@ -101,7 +101,7 @@ This ensures your code continues to work as expected, even if Cloudflare updates
 
 ### **`preview_urls`**
 
-It’s used to create a previewable URL. That’s a feature in Cloudflare Workers, but it’s not really useful for a small project. Feel free to take a look at: (https://developers.cloudflare.com/workers/configuration/previews/)[https://developers.cloudflare.com/workers/configuration/previews/]
+It’s used to create a previewable URL. That’s a feature in Cloudflare Workers, but it’s not really useful for a small project. Feel free to take a look at: [https://developers.cloudflare.com/workers/configuration/previews/](https://developers.cloudflare.com/workers/configuration/previews/)
 
 ## Observability:
 
