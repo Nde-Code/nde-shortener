@@ -70,7 +70,7 @@ The API is available in two versions, each with its own usage details:
 
 To use this **API endpoints** you can use:
 
-- JavaScript: CORS is `enabled` and for all domains (`*`).
+- JavaScript: CORS is `enabled` and for all domains.
 
 - cURL: [https://curl.se/](https://curl.se/)
 
@@ -95,7 +95,7 @@ To access protected endpoints, you must include an API or ADMIN key in **the req
 
 ## 🚀 Getting Started:
 
-### For those who want to create their own instance (using Deno).
+### For those who want to create their own instance using Deno.
 
 ### 1. Install deno, clone the project and go in the folder:
 
@@ -253,7 +253,7 @@ With:
 
 - **HASH_KEY**: The `SALT` value used to hash IP addresses. Ensure this value is both secure and robust.
 
-- **ADMIN_KEY**: An administrative key that grants the owner permission to `delete` and `verify` links.
+- **ADMIN_KEY**: An administrative key that grants the owner permission to `delete`, `list` and `verify` links.
 
 ## ▶️ In the end, run the project:
 
