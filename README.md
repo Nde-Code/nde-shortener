@@ -252,7 +252,7 @@ Here's a brief summary of what the `tsconfig.json` file do:
 
 This project doesn't rely on any external libraries or dependencies, so there's no `package.json` or npm-related files.
 
-## Replacing `Deno.*` in the Original Code:
+## Merge original Deno source code to make it Wrangler-compatible:
 
 Let's briefly summarize how the code was adapted for compatibility with Cloudflare Workers.
 
@@ -321,8 +321,8 @@ if (!(await checkDailyRateLimit(hashedIP)))
 
 by:
 ```js
-if (!(await checkTimeRateLimit(env.RATE_LIMIT_KV, hashedIP)))
-if (!(await checkDailyRateLimit(env.RATE_LIMIT_KV, hashedIP)))
+if (!(await checkTimeRateLimit(env.YOUR_KV_NAME, hashedIP)))
+if (!(await checkDailyRateLimit(env.YOUR_KV_NAME, hashedIP)))
 ```
 
 - 4. A few minor changes were made as well—mostly trivial adjustments, such as a type fix in `utilities/verify.ts`.  
