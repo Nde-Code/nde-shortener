@@ -312,7 +312,18 @@ then remove: `Deno.env.get(...)` in `config.ts`.
 
 - 3. The `utilities/rate.ts` file is the only one that **has been completely rewritten**.  
 You likely won't need to make any further changes to it.  
-If you'd like to review it, you can find it here: [utilities/rate.ts](utilities/rate.ts)
+If you'd like to review it, you can find it here: [utilities/rate.ts](utilities/rate.ts).
+To complete, replace each of the following lines:
+```js
+if (!(await checkTimeRateLimit(hashedIP)))
+if (!(await checkDailyRateLimit(hashedIP)))
+```
+
+by:
+```js
+if (!(await checkTimeRateLimit(env.RATE_LIMIT_KV, hashedIP)))
+if (!(await checkDailyRateLimit(env.RATE_LIMIT_KV, hashedIP)))
+```
 
 - 4. A few minor changes were made as well—mostly trivial adjustments, such as a type fix in `utilities/verify.ts`.  
 These changes were straightforward and don't require further explanation.
