@@ -179,7 +179,9 @@ wrangler types
 
 > Be sure that your `wrangler.jsonc` is correctly configured before running this command.
 
-and put in the `tsconfig.json`: 
+⚠️ **Note:** When you’ve configured environment variables, this command may sometimes include your secrets directly in the generated type file. Be very careful, so always review this file (`worker-configuration.d.ts`) before committing or sharing your code. This file has been added to `.gitignore` and is excluded from the source tree in VS Code by default. (1)
+
+and put in `tsconfig.json`: 
 
 > already done, if you've cloned the project so you don't need to do that.
 
@@ -203,9 +205,50 @@ and put in the `tsconfig.json`:
 }
 ```
 
-this is the minimum TypeScript configuration required to make the project work.
+Here's a brief summary of what the `tsconfig.json` file do:
 
-⚠️ **Note:** When you’ve configured environment variables, this command may sometimes include your secrets directly in the generated type file. Be very careful, so always review this file (`worker-configuration.d.ts`) before committing or sharing your code. This file has been added to `.gitignore` and is excluded from the source tree in VS Code by default. (1)
+* **`noEmit: true`**
+  Prevents TypeScript from emitting compiled JS files locally. The build and bundling is handled by **Wrangler/esbuild**, so this is only for type checking.
+
+* **`allowImportingTsExtensions: true`**
+  Allows importing `.ts` files directly, which is required for Deno-style and relative imports.
+
+* **`target: "ES2020"`**
+  Uses modern JavaScript syntax supported by the Worker runtime.
+
+* **`lib: ["ES2020", "DOM"]`**
+  Includes modern JS features (`ES2020`) and standard Web APIs (`DOM`) like `fetch`, `Request`, and `Response`.
+
+* **`module: "ESNext"`**
+  Uses ES Modules, which is the standard for Workers and modern TypeScript projects.
+
+* **`moduleResolution: "Node"`**
+  Tells TypeScript/IDE how to resolve modules.
+
+  * Not strictly needed for relative `.ts` imports (they work anyway).
+  * Useful if you later add npm packages: TypeScript and VS Code will correctly locate modules.
+  * Does **not affect the final bundle**; esbuild handles module resolution.
+
+* **`strict: true`**
+  Enables all strict type checking options for safer, more predictable code.
+
+* **`esModuleInterop: true`**
+  Facilitates interoperability with CommonJS modules if needed.
+
+* **`skipLibCheck: true`**
+  Skips type checking for `.d.ts` files in dependencies to speed up compilation.
+
+* **`forceConsistentCasingInFileNames: true`**
+  Prevents file casing errors across different operating systems.
+
+* **`types: ["./worker-configuration.d.ts"]`**
+  Includes type definitions for Wrangler bindings (KV, R2, Durable Objects, etc.).
+
+* **`include`**
+  Files/folders that TypeScript will type check: project source code and types.
+
+* **`exclude`**
+  Ignored folders: build artifacts (`dist`), dependencies (`node_modules`).
 
 This project doesn't rely on any external libraries or dependencies, so there's no `package.json` or npm-related files.
 
