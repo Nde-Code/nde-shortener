@@ -308,7 +308,7 @@ async function handler(req: Request, env: Env): Promise<Response> {
 }
 ``` 
 
-then remove: `Deno.env.get(...)` in `config.ts`.
+Then remove `Deno.env.get(...)` and replace it with `""` in `config.ts` (see it [here](config.ts)).
 
 - 3. The `utilities/rate.ts` file is the only one that **has been completely rewritten**.  
 You likely won't need to make any further changes to it.  
@@ -325,8 +325,7 @@ if (!(await checkTimeRateLimit(env.YOUR_KV_NAME, hashedIP)))
 if (!(await checkDailyRateLimit(env.YOUR_KV_NAME, hashedIP)))
 ```
 
-- 4. A few minor changes were made as well—mostly trivial adjustments, such as a type fix in `utilities/verify.ts`.  
-These changes were straightforward and don't require further explanation.
+- 4. A minor change needs to be made: a type fix in `utilities/verify.ts`.  
 
 # 📌 Run the project and deploy it once it's ready:
 
