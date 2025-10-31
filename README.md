@@ -48,11 +48,23 @@ First, create the `wrangler.jsonc` file, which contains the full configuration f
 
 	"observability": {
 
-		"enabled": true,
+    "enabled": true,
 
-		"head_sampling_rate": 1
+    "head_sampling_rate": 1,
 
-	},
+    "logs": {
+
+      "invocation_logs": false
+
+    },
+
+    "traces": {
+
+      "enabled": false
+
+    }
+
+  },
 
 	"kv_namespaces": [
 
@@ -116,6 +128,24 @@ Defines the **percentage of requests sampled for tracing** (from `0` to `1`).
 
 * `1` = 100% of requests are sampled (useful for debugging).
 * `0.1` = 10% of requests are traced (better for production environments).
+
+### **`observability.logs.invocation_logs`**
+
+Controls whether **automatic invocation logs** are collected for each Worker execution.
+
+* `true` (default) = Cloudflare logs metadata like request method, URL, headers, and execution details.
+* `false` = Disables automatic logs, keeping only your custom `console.log` entries.
+
+> Disabling invocation logs is recommended for **GDPR compliance**, as it prevents Cloudflare from storing potentially sensitive request data.
+
+### **`observability.tracing.enabled`**
+
+Controls whether **distributed tracing** is enabled for your Worker.
+
+* `true` = Enables tracing spans and trace IDs for each request (requires compatible tracing backend).
+* `false` = Disables tracing entirely.
+
+> Tracing is disabled by default. If you're not using OpenTelemetry or a tracing system, leave this off to reduce data collection.
 
 ## KV Namespaces:
 
