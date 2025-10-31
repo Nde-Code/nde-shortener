@@ -35,18 +35,18 @@ wrangler login
 # ⚙️ Setting up the configuration:
 
 First, create the `wrangler.jsonc` file, which contains the full configuration for your project. It should look like this:
-```js
+```jsonc
 {
 
-	"name": "project_name",
+  "name": "project_name",
 
-	"main": "main.ts",
+  "main": "main.ts",
 
-	"compatibility_date": "2025-10-08",
+  "compatibility_date": "2025-10-08",
 
-	"preview_urls": false,
+  "preview_urls": false,
 
-	"observability": {
+  "observability": {
 
     "enabled": true,
 
@@ -66,32 +66,32 @@ First, create the `wrangler.jsonc` file, which contains the full configuration f
 
   },
 
-	"kv_namespaces": [
+  "kv_namespaces": [
 
-		{
+    {
 
-			"binding": "YOUR_KV_NAME",
+      "binding": "YOUR_KV_NAME",
 
-			"id": "YOUR_KV_ID"
+      "id": "YOUR_KV_ID"
 
-		}
+    }
 
-	],
+  ],
 
-	"vars": {
+  "vars": {
 
-		"FIREBASE_HOST_LINK": "YOUR_FIREBASE_URL",
+    "FIREBASE_HOST_LINK": "YOUR_FIREBASE_URL",
 
-		"FIREBASE_HIDDEN_PATH": "YOUR_SECRET_PATH",
+    "FIREBASE_HIDDEN_PATH": "YOUR_SECRET_PATH",
 
-		"HASH_KEY": "THE_KEY_USED_TO_HASH_IPS",
+    "HASH_KEY": "THE_KEY_USED_TO_HASH_IPS",
 
-		"ADMIN_KEY": "THE_ADMIN_KEY_TO_DELETE_AND_VERIFY"
+    "ADMIN_KEY": "THE_ADMIN_KEY_TO_DELETE_AND_VERIFY"
 
-	}
+  }
 
 }
-``` 
+```
 
 ## Main elements:
 
