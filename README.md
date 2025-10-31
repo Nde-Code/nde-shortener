@@ -325,7 +325,13 @@ if (!(await checkTimeRateLimit(env.YOUR_KV_NAME, hashedIP)))
 if (!(await checkDailyRateLimit(env.YOUR_KV_NAME, hashedIP)))
 ```
 
-- 4. A minor change needs to be made: a type fix in `utilities/verify.ts`.  
+- 4. A minor change needs to be made: a type fix in `utilities/verify.ts`.
+ 
+- 5. To retrieve the IP address in Cloudflare Workers, use the following code:
+```ts
+const ip: string = req.headers.get("cf-connecting-ip") ?? "unknown";
+```
+You can check: [https://community.cloudflare.com/t/ip-address-of-the-remote-origin-of-the-request/13080/3](https://community.cloudflare.com/t/ip-address-of-the-remote-origin-of-the-request/13080/3) for more information.
 
 # 📌 Run the project and deploy it once it's ready:
 
