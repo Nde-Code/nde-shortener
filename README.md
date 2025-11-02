@@ -255,7 +255,7 @@ With:
 
 - **ADMIN_KEY**: An administrative key that grants the owner permission to `delete`, `list` and `verify` links.
 
-## ▶️ In the end, run the project:
+### 5. Run the project:
 
 When setup is complete, start the project with:
 
@@ -263,5 +263,13 @@ When setup is complete, start the project with:
 deno task dev
 ```
 
-Everything should work as expected. If you encounter any issues, feel free to open an issue.
+## 📄 License:
+
+This project is licensed under the [Apache License v2.0](LICENSE).
+
+## 📞 Contact:
+
+Created and maintained by [Nde-Code](https://nde-code.github.io/).
+
+> Feel free to reach out for questions or collaboration, or open an issue or pull request and I'll be happy to help.
  
