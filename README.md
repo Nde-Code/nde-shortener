@@ -6,8 +6,6 @@ A simple and lightweight URL shortener API built with [Deno](https://deno.land/)
 
 > Make sure to configure your `.env` variables if you use these buttons.
 
-> I haven't picked a real name for the project yet, so I just called it: `nde-shortener`.
-
 ## 📦 Features:
 
 - Security comes first: secrets are stored in a `.env` file, with multiple validations performed before transmission.
