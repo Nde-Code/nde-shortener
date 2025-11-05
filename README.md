@@ -2,134 +2,103 @@
 
 This branch contains source code compatible with Cloudflare Workers.
 
-Go to **main** via: [https://github.com/Nde-Code/nde-shortener](https://github.com/Nde-Code/nde-shortener)
+> For those who don't know what Cloudflare Workers and edge computing are, take a look at: [https://workers.cloudflare.com/](https://workers.cloudflare.com/) and [https://developers.cloudflare.com/workers/](https://developers.cloudflare.com/workers/)
 
-And **cf-workers**: [https://github.com/Nde-Code/nde-shortener/tree/cf-workers](https://github.com/Nde-Code/nde-shortener/tree/cf-workers)
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/Nde-Code/nde-shortener&branch=cf-workers)
+
+> Make sure that if you use this, Cloudflare has created a KV namespace and allows you to set environment variables. Read the documentation before using this widget.
 
 The project is now hosted at [https://nsh.nde-code.workers.dev/](https://nsh.nde-code.workers.dev/), and the updated privacy policy can be found at [privacy.md](privacy.md).
 
 # 🚀 To begin working with this version:
 
-- 1. Create or login to your cloudflare account: [https://dash.cloudflare.com/sign-up](https://dash.cloudflare.com/sign-up)
+## 1. Create or login to your cloudflare account: [https://dash.cloudflare.com/sign-up](https://dash.cloudflare.com/sign-up)
 
-- 2. Install Node.js and npm (I've used [Volta](https://volta.sh/Volta) on WSL): [https://nodejs.org/fr/download](https://nodejs.org/fr/download)
+## 2. Install Node.js and npm (I've used [Volta](https://volta.sh/Volta) on [WSL](https://learn.microsoft.com/en-us/windows/wsl/about)): [https://nodejs.org/en/download](https://nodejs.org/en/download)
 
-- 3. Install the Wrangler CLI using:
+## 3. Install the Wrangler CLI using:
 ```bash
 npm install -g wrangler
 ```
 
 > If you haven't installed Wrangler globally, you'll need to prefix commands with `npx`, like `npx wrangler`.
 
-- 4. Clone the project branch:
+## 4. Clone the project branch:
 ```bash
 git clone --branch cf-workers --single-branch https://github.com/Nde-Code/nde-shortener.git
 ```
 
-- 5. Log your Wrangler CLI to your Cloudflare account using:
+## 5. Log your Wrangler CLI to your Cloudflare account using:
 ```bash
 wrangler login
 ```
 > Make sure to do this securely on a trusted network.
 
-# ⚙️ Setting up the configuration:
+## 6. Setting up the configuration:
 
 First, create the `wrangler.jsonc` file, which contains the full configuration for your project. It should look like this:
 ```jsonc
 {
-
-  "name": "project_name",
-
-  "main": "main.ts",
-
-  "compatibility_date": "2025-10-08",
-
-  "preview_urls": false,
-
-  "observability": {
-
-    "enabled": true,
-
-    "head_sampling_rate": 1,
-
-    "logs": {
-
-      "invocation_logs": false
-
-    },
-
-    "traces": {
-
-      "enabled": false
-
-    }
-
-  },
-
-  "kv_namespaces": [
-
-    {
-
-      "binding": "YOUR_KV_NAME",
-
-      "id": "YOUR_KV_ID"
-
-    }
-
-  ],
-
-  "vars": {
-
-    "FIREBASE_HOST_LINK": "YOUR_FIREBASE_URL",
-
-    "FIREBASE_HIDDEN_PATH": "YOUR_SECRET_PATH",
-
-    "HASH_KEY": "THE_KEY_USED_TO_HASH_IPS",
-
-    "ADMIN_KEY": "THE_ADMIN_KEY_TO_DELETE_AND_VERIFY"
-
-  }
-
+	"name": "project_name",
+	"main": "main.ts",
+	"compatibility_date": "2025-10-08",
+	"preview_urls": false,
+	"observability": {
+		"enabled": true,
+		"head_sampling_rate": 1,
+		"logs": {
+			"invocation_logs": false
+		},
+		"traces": {
+			"enabled": false
+		}
+	},
+	"kv_namespaces": [
+		{
+			"binding": "YOUR_KV_NAME",
+			"id": "YOUR_KV_ID"
+		}
+	]
 }
 ```
 
-## Main elements:
+### Main elements:
 
-### **`name`**
+#### **`name`**
 
 Defines the **name of your Worker project**.
 This determines the public URL for your Worker on Cloudflare (for example:
 `https://project_name.username.workers.dev`).
 
-### **`main`**
+#### **`main`**
 
 Specifies the **entry point** of your Worker script.
 This is the file that exports your main fetch handler.
 
-### **`compatibility_date`**
+#### **`compatibility_date`**
 
 Locks your Worker to a specific version of the Cloudflare Workers runtime.
 This ensures your code continues to work as expected, even if Cloudflare updates the runtime.
 
-### **`preview_urls`**
+#### **`preview_urls`**
 
 It’s used to create a previewable URL. That’s a feature in Cloudflare Workers, but it’s not really useful for a small project. Feel free to take a look at: [https://developers.cloudflare.com/workers/configuration/previews/](https://developers.cloudflare.com/workers/configuration/previews/)
 
-## Observability:
+### Observability:
 
-### **`observability.enabled`**
+#### **`observability.enabled`**
 
 When set to `true`, enables **automatic metrics and logs collection** for your Worker.
 This lets you monitor performance and errors in the Cloudflare dashboard.
 
-### **`observability.head_sampling_rate`**
+#### **`observability.head_sampling_rate`**
 
 Defines the **percentage of requests sampled for tracing** (from `0` to `1`).
 
 * `1` = 100% of requests are sampled (useful for debugging).
 * `0.1` = 10% of requests are traced (better for production environments).
 
-### **`observability.logs.invocation_logs`**
+#### **`observability.logs.invocation_logs`**
 
 Controls whether **automatic invocation logs** are collected for each Worker execution.
 
@@ -138,7 +107,7 @@ Controls whether **automatic invocation logs** are collected for each Worker exe
 
 > Disabling invocation logs is recommended for **GDPR compliance**, as it prevents Cloudflare from storing potentially sensitive request data.
 
-### **`observability.tracing.enabled`**
+#### **`observability.tracing.enabled`**
 
 Controls whether **distributed tracing** is enabled for your Worker.
 
@@ -147,9 +116,9 @@ Controls whether **distributed tracing** is enabled for your Worker.
 
 > Tracing is disabled by default. If you're not using OpenTelemetry or a tracing system, leave this off to reduce data collection.
 
-## KV Namespaces:
+### KV Namespaces:
 
-### **`kv_namespaces`**
+#### **`kv_namespaces`**
 
 Binds your Worker to your **Cloudflare KV (Key-Value)** namespace.
 
@@ -165,11 +134,16 @@ And complete the `wrangler.jsonc` file with the following configuration:
 * **`binding`** → The variable name you’ll use inside your code (here: `YOUR_KV_NAME`).
 * **`id`** → The unique namespace ID from your Cloudflare dashboard.
 
-## Environment Variables:
+### Environment Variables:
 
-### **`vars`**
+To start working **locally** with environment variables, create a file called `.dev.vars` and add the following content:
 
-Defines global environment variables accessible inside your Worker via the `env` object.
+```env
+FIREBASE_HOST_LINK="YOUR_FIREBASE_URL"
+FIREBASE_HIDDEN_PATH="YOUR_SECRET_PATH"
+HASH_KEY="THE_KEY_USED_TO_HASH_IPS"
+ADMIN_KEY="THE_ADMIN_KEY_TO_DELETE_AND_VERIFY"
+```
 
 **List of variables in this project:**
 
@@ -180,7 +154,8 @@ Defines global environment variables accessible inside your Worker via the `env`
 | `HASH_KEY`             | The cryptographic key used to hash user IPs or sensitive identifiers. |
 | `ADMIN_KEY`            | A private admin key used to verify or delete data.          |
 
-⚠️ **Note:** Values defined in `vars` are stored **in plaintext** when you deploy with `vars` in `wrangler.jsonc`. For sensitive information, use **Wrangler Secrets** instead:
+When you have finished, **make sure there are no traces of secrets** in your code, and run the following command.  
+*(Normally, you'll only need to do this once, when you first create the project.)*
 
 ```bash
 wrangler secret put FIREBASE_HOST_LINK
@@ -189,17 +164,15 @@ wrangler secret put HASH_KEY
 wrangler secret put ADMIN_KEY
 ```
 
-> Check out [https://developers.cloudflare.com/workers/configuration/secrets/](https://developers.cloudflare.com/workers/configuration/secrets/) to learn how to use the command.
+> Check out [https://developers.cloudflare.com/workers/configuration/secrets/](https://developers.cloudflare.com/workers/configuration/secrets/) if you need further information.
 
-And make sure to **comment out the `vars` key** before deploying to Cloudflare.
+# 🔧 Code adjustments for Wrangler compatibility:
 
-# 🧰 Code adjustments for Wrangler compatibility:
-
-Cloudflare Workers use the V8 isolate engine to run applications. They don’t use traditional Node.js runtimes like Deno, Node.js, or Bun under the hood. Therefore, to make this project compatible, every use of `Deno.*` must be replaced with an equivalent API that works in the Cloudflare Workers environment.
+Cloudflare Workers use the V8 isolate engine called [workerd](https://github.com/cloudflare/workerd) to run applications. They don’t use traditional Node.js runtimes like Deno, Node.js, or Bun under the hood. Cloudflare Workers runtime is based on something similar to `Deno` (thanks to Web APIs), so it's easy to edit and adjust your code to make it compatible. Therefore, to make this project compatible, every use of `Deno.*` must be replaced with an equivalent API that works in the Cloudflare Workers environment.
 
 This section explains how the code was transformed to be compatible with Cloudflare Workers.
 
-## First, initialize TypeScript types
+## 1. First of all, initialize TypeScript types
 
 To benefit from TypeScript definitions in your editor and avoid compilation errors, you can add the Cloudflare Workers type definitions by running:
 
@@ -209,7 +182,8 @@ wrangler types
 
 > Be sure that your `wrangler.jsonc` is correctly configured before running this command.
 
-⚠️ **Note:** When you’ve configured environment variables, this command may sometimes include your secrets directly in the generated type file. Be very careful, so always review this file (`worker-configuration.d.ts`) before committing or sharing your code. This file has been added to `.gitignore` and is excluded from the source tree in VS Code by default. (1)
+⚠️ **Note:** Cloudflare mentions that you can share this file with others: [https://developers.cloudflare.com/workers/languages/typescript/](https://developers.cloudflare.com/workers/languages/typescript/).  
+However, I once checked this file before committing and found secrets inside (may be due to a mistake I made), so be cautious when planning to share it.
 
 and put in `tsconfig.json`: 
 
@@ -272,7 +246,7 @@ Here's a brief summary of what the `tsconfig.json` file do:
   Prevents file casing errors across different operating systems.
 
 * **`types: ["./worker-configuration.d.ts"]`**
-  Includes type definitions for Wrangler bindings (KV, R2, Durable Objects, etc.).
+  Includes type definitions for Wrangler bindings (KV, R2, Durable Objects, ...).
 
 * **`include`**
   Files/folders that TypeScript will type check: project source code and types.
@@ -282,11 +256,11 @@ Here's a brief summary of what the `tsconfig.json` file do:
 
 This project doesn't rely on any external libraries or dependencies, so there's no `package.json` or npm-related files.
 
-## Merge original Deno source code to make it Wrangler-compatible:
+## 2: Merge original Deno source code to make it Wrangler-compatible:
 
 Let's briefly summarize how the code was adapted for compatibility with Cloudflare Workers.
 
-- 1. The `.serve()` method needs to be replaced:
+### 1. The `.serve()` method needs to be replaced:
 ```ts
 Deno.serve(handler);
 ```
@@ -302,7 +276,7 @@ export default {
 
 };
 ```
-- 2. Create an `Env` type (see point 1 to understand why we define our own type):
+### 2. Create an `Env` type (feel free to check: [https://developers.cloudflare.com/workers/configuration/environment-variables/](https://developers.cloudflare.com/workers/configuration/environment-variables/)):
 ```ts
  export interface Env {
 
@@ -325,7 +299,7 @@ Then, set your variables inside the `handler` function with `env`:
 ```ts
 async function handler(req: Request, env: Env): Promise<Response> {
 
-	config.FIREBASE_URL = env.FIREBASE_HOST_LINK ?? "";
+    config.FIREBASE_URL = env.FIREBASE_HOST_LINK ?? "";
 
     config.FIREBASE_HIDDEN_PATH = env.FIREBASE_HIDDEN_PATH ?? "";
 
@@ -333,14 +307,14 @@ async function handler(req: Request, env: Env): Promise<Response> {
 
     config.HASH_KEY = env.HASH_KEY ?? "";
 
-	// ...
+    // ...
 
 }
 ``` 
 
 Then remove `Deno.env.get(...)` and replace it with `""` in `config.ts` (see it [here](config.ts)).
 
-- 3. The `utilities/rate.ts` file is the only one that **has been completely rewritten**.  
+### 3. The `utilities/rate.ts` file is the only one that **has been completely rewritten**.  
 You likely won't need to make any further changes to it.  
 If you'd like to review it, you can find it here: [utilities/rate.ts](utilities/rate.ts).
 To complete, replace each of the following lines:
@@ -351,19 +325,35 @@ if (!(await checkDailyRateLimit(hashedIP)))
 
 by:
 ```js
-if (!(await checkTimeRateLimit(env.YOUR_KV_NAME, hashedIP)))
+if (!(await checkTimeRateLimit(hashedIP))) // It's the same, it doesn't change.
 if (!(await checkDailyRateLimit(env.YOUR_KV_NAME, hashedIP)))
 ```
 
-- 4. A minor change needs to be made: a type fix in `utilities/verify.ts`.
+and make sure to replace `YOUR_KV_NAME` with the value you specified for this field in the `wrangler.jsonc` file.
+
+The anti-spam rate limiting works with the edge cache.  
+Feel free to check out the documentation for more details:
+
+  - [https://developers.cloudflare.com/workers/runtime-apis/cache/](https://developers.cloudflare.com/workers/runtime-apis/cache/)
+
+  - [https://developers.cloudflare.com/workers/examples/cache-api/](https://developers.cloudflare.com/workers/examples/cache-api/)
+
+  - [https://developers.cloudflare.com/workers/reference/how-the-cache-works/](https://developers.cloudflare.com/workers/reference/how-the-cache-works/)
  
-- 5. To retrieve the IP address in Cloudflare Workers, use the following code:
+### 4. To retrieve the IP address in Cloudflare Workers, use the following code:
 ```ts
 const ip: string = req.headers.get("cf-connecting-ip") ?? "unknown";
 ```
-You can check: [https://community.cloudflare.com/t/ip-address-of-the-remote-origin-of-the-request/13080/3](https://community.cloudflare.com/t/ip-address-of-the-remote-origin-of-the-request/13080/3) for more information.
 
-# 📌 Run the project and deploy it once it's ready:
+Instead of using the value from the `connInfo: Deno.ServeHandlerInfo` parameter:
+
+```ts
+const ip: string = (connInfo.remoteAddr.transport === "tcp") ? connInfo.remoteAddr.hostname : "unknown";
+```
+
+> You can check: [https://community.cloudflare.com/t/ip-address-of-the-remote-origin-of-the-request/13080/3](https://community.cloudflare.com/t/ip-address-of-the-remote-origin-of-the-request/13080/3) for more information.
+
+# 📌 Run the project and deploy it:
 
 To run locally, run:
 
@@ -373,7 +363,7 @@ wrangler dev
 
 > If everything works correctly, that indicates your code is now compatible with Cloudflare Workers.
 
-To bundle the project before deploying, run:
+To bundle the project **(optional)**, run:
 
 ```bash
 wrangler build

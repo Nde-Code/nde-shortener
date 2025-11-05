@@ -22,7 +22,9 @@ import {
 	
 	sha256,
 	
-	parseJsonBody
+	parseJsonBody,
+	
+	printLogLine
 
 } from "./utilities/utils.ts";
 
@@ -100,11 +102,17 @@ async function handler(req: Request, env: Env): Promise<Response> {
 
 	if (req.method === "GET" && pathname === "/urls") {
 
-		if (!(await checkTimeRateLimit(env.RATE_LIMIT_KV, hashedIP))) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'RATE_LIMIT_EXCEEDED'), 429);
+		if (!(await checkTimeRateLimit(hashedIP))) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'RATE_LIMIT_EXCEEDED'), 429);
 
 		const apiKey: string | null = getApiKeyFromRequest(req);
 
-		if (apiKey !== config.ADMIN_KEY) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'WRONG_API_KEY_FOR_URLS_DB'), 401);
+		if (apiKey !== config.ADMIN_KEY) {
+
+			printLogLine("WARN", "Invalid API or Admin key provided for listing URL(s) !")
+			
+			return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'WRONG_API_KEY_FOR_URLS_DB'), 401);
+		
+		}
 
 		else {
 
@@ -120,13 +128,21 @@ async function handler(req: Request, env: Env): Promise<Response> {
 
 	if (req.method === "PATCH" && pathname.startsWith("/verify/")) {
 
+		if (!(await checkTimeRateLimit(hashedIP))) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'RATE_LIMIT_EXCEEDED'), 429);
+
 		const ID: string | boolean = extractValidID(pathname);
 
 		if (ID === false) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'NO_ID'), 400);
 
 		const apiKey: string | null = getApiKeyFromRequest(req);
 
-		if (apiKey !== config.ADMIN_KEY) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'WRONG_API_KEY_FOR_VERIFICATION'), 401);
+		if (apiKey !== config.ADMIN_KEY) {
+
+			printLogLine("WARN", "Invalid API or Admin key provided for link verification !");
+			
+			return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'WRONG_API_KEY_FOR_VERIFICATION'), 401);
+		
+		}
 
 		const result: VerificationStatus = await setIsVerifiedTrue(config.FIREBASE_URL, ID);
 
@@ -140,13 +156,21 @@ async function handler(req: Request, env: Env): Promise<Response> {
 
 	if (req.method === "DELETE" && pathname.startsWith("/delete/")) {
 
+		if (!(await checkTimeRateLimit(hashedIP))) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'RATE_LIMIT_EXCEEDED'), 429);
+
 		const ID: string | boolean = extractValidID(pathname);
 
 		if (ID === false) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'NO_ID'), 400);
 		
 		const apiKey: string | null = getApiKeyFromRequest(req);
 
-		if (apiKey !== config.ADMIN_KEY) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'WRONG_API_KEY_FOR_DELETION'), 401);
+		if (apiKey !== config.ADMIN_KEY) {
+
+			printLogLine("WARN", "Invalid API or Admin key provided for deletion !");
+			
+			return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'WRONG_API_KEY_FOR_DELETION'), 401);
+		
+		}
 
 		else {
 
@@ -190,7 +214,7 @@ async function handler(req: Request, env: Env): Promise<Response> {
 
   	if (req.method === "POST" && pathname === "/post-url") {
 
-		if (!(await checkTimeRateLimit(env.RATE_LIMIT_KV, hashedIP))) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'RATE_LIMIT_EXCEEDED'), 429);
+		if (!(await checkTimeRateLimit(hashedIP))) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'RATE_LIMIT_EXCEEDED'), 429);
 
 		const data: UrlPostBody | null = await parseJsonBody<UrlPostBody>(req);
 
@@ -219,11 +243,11 @@ async function handler(req: Request, env: Env): Promise<Response> {
 			else return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'HASH_COLLISION'), 500);
 			
 		}
-
+		
 		const completeDB: UrlDatabaseMap | null = await readInFirebaseRTDB<UrlDatabaseMap>(config.FIREBASE_URL);
 		
 		if (completeDB && Object.keys(completeDB).length > config.FIREBASE_ENTRIES_LIMIT) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'DB_LIMIT_REACHED'), 507);
-
+		
 		if (!(await checkDailyRateLimit(env.RATE_LIMIT_KV, hashedIP))) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'WRITE_LIMIT_EXCEEDED'), 429);
 
 		const firebaseData: LinkDetails = {
