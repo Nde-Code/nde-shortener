@@ -1,21 +1,53 @@
 import { config } from "../config.ts";
 
-const kv = await Deno.openKv();
+interface CacheEntry { expireAt: number; }
 
-export async function checkTimeRateLimit(hashedIp: string): Promise<boolean> {
+const cache = new Map<string, CacheEntry>();
 
-    const now: number = Date.now();
+function setCache(key: string, ttlSeconds: number): void { cache.set(key, { expireAt: Date.now() + ttlSeconds * 1000 }); }
 
-    const key: string[] = ["ipTimestamp", hashedIp];
+function getCache(key: string): boolean {
 
-    const entry: Deno.KvEntryMaybe<number> = await kv.get<number>(key);
+    const entry = cache.get(key);
 
-    if (entry.value && now - entry.value < (config.RATE_LIMIT_INTERVAL_S * 1000)) return false;
+    if (!entry) return false;
 
-    await kv.set(key, now, { expireIn: (config.RATE_LIMIT_INTERVAL_S * 1000) });
+    if (Date.now() > entry.expireAt) {
+
+        cache.delete(key);
+
+        return false;
+
+    }
 
     return true;
+
+}
+
+setInterval(() => {
+
+    const now = Date.now();
+
+    for (const [k, v] of cache) {
+        
+        if (v.expireAt < now) cache.delete(k);
     
+    }
+    
+}, 60_000);
+
+const kv = await Deno.openKv();
+
+export function checkTimeRateLimit(hashedIp: string, limitSeconds = config.RATE_LIMIT_INTERVAL_S): boolean {
+
+    const cacheKey: string = `ratelimit:${hashedIp}`;
+
+    if (getCache(cacheKey)) return false; 
+
+    setCache(cacheKey, limitSeconds);
+
+    return true;
+
 }
 
 export async function checkDailyRateLimit(hashedIp: string): Promise<boolean> {
@@ -32,27 +64,45 @@ export async function checkDailyRateLimit(hashedIp: string): Promise<boolean> {
 
         const windowData: WindowData = { startTimestamp: now, count: 1 };
 
-        await kv.set(key, windowData, { expireIn: (config.IPS_PURGE_TIME_DAYS * 24 * 60 * 60 * 1000) });
+        await kv.set(key, windowData, {
+
+            expireIn: config.IPS_PURGE_TIME_DAYS * 24 * 60 * 60 * 1000
+
+        });
 
         return true;
 
     }
 
-    if (now - entry.value.startTimestamp >= (config.IPS_PURGE_TIME_DAYS * 24 * 60 * 60 * 1000)) {
+    const { startTimestamp, count } = entry.value;
 
-        const windowData: WindowData = { startTimestamp: now, count: 1 };
+    const windowDuration = config.IPS_PURGE_TIME_DAYS * 24 * 60 * 60 * 1000;
 
-        await kv.set(key, windowData, { expireIn: (config.IPS_PURGE_TIME_DAYS * 24 * 60 * 60 * 1000) });
+    if (now - startTimestamp >= windowDuration) {
+
+        const windowData: WindowData = {
+            
+            startTimestamp: now,
+            
+            count: 1
+        
+        };
+
+        await kv.set(key, windowData, { expireIn: windowDuration });
 
         return true;
 
     }
 
-    if (entry.value.count >= config.MAX_DAILY_WRITES) return false;
+    if (count >= config.MAX_DAILY_WRITES) return false;
 
     entry.value.count++;
 
-    await kv.set(key, entry.value, { expireIn: (config.IPS_PURGE_TIME_DAYS * 24 * 60 * 60 * 1000) - (now - entry.value.startTimestamp) });
+    await kv.set(key, entry.value, {
+
+        expireIn: windowDuration - (now - startTimestamp)
+
+    });
 
     return true;
 

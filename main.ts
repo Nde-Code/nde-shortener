@@ -22,7 +22,9 @@ import {
 	
 	sha256,
 	
-	parseJsonBody
+	parseJsonBody,
+
+	printLogLine
 
 } from "./utilities/utils.ts";
 
@@ -92,11 +94,17 @@ async function handler(req: Request, connInfo: Deno.ServeHandlerInfo): Promise<R
 
 	if (req.method === "GET" && pathname === "/urls") {
 
-		if (!(await checkTimeRateLimit(hashedIP))) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'RATE_LIMIT_EXCEEDED'), 429);
+		if (!checkTimeRateLimit(hashedIP)) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'RATE_LIMIT_EXCEEDED'), 429);
 
 		const apiKey: string | null = getApiKeyFromRequest(req);
 
-		if (apiKey !== config.ADMIN_KEY) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'WRONG_API_KEY_FOR_URLS_DB'), 401);
+		if (apiKey !== config.ADMIN_KEY) {
+
+			printLogLine("WARN", "Invalid API or Admin key provided for listing URL(s) !");
+			
+			return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'WRONG_API_KEY_FOR_URLS_DB'), 401);
+		
+		}
 
 		else {
 
@@ -112,7 +120,7 @@ async function handler(req: Request, connInfo: Deno.ServeHandlerInfo): Promise<R
 
 	if (req.method === "PATCH" && pathname.startsWith("/verify/")) {
 
-		if (!(await checkTimeRateLimit(hashedIP))) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'RATE_LIMIT_EXCEEDED'), 429);
+		if (!checkTimeRateLimit(hashedIP)) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'RATE_LIMIT_EXCEEDED'), 429);
 
 		const ID: string | boolean = extractValidID(pathname);
 
@@ -120,7 +128,13 @@ async function handler(req: Request, connInfo: Deno.ServeHandlerInfo): Promise<R
 
 		const apiKey: string | null = getApiKeyFromRequest(req);
 
-		if (apiKey !== config.ADMIN_KEY) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'WRONG_API_KEY_FOR_VERIFICATION'), 401);
+		if (apiKey !== config.ADMIN_KEY) {
+
+			printLogLine("WARN", "Invalid API or Admin key provided for link verification !");
+			
+			return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'WRONG_API_KEY_FOR_VERIFICATION'), 401);
+		
+		}
 
 		const result: VerificationStatus = await setIsVerifiedTrue(config.FIREBASE_URL, ID);
 
@@ -134,7 +148,7 @@ async function handler(req: Request, connInfo: Deno.ServeHandlerInfo): Promise<R
 
 	if (req.method === "DELETE" && pathname.startsWith("/delete/")) {
 
-		if (!(await checkTimeRateLimit(hashedIP))) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'RATE_LIMIT_EXCEEDED'), 429);
+		if (!checkTimeRateLimit(hashedIP)) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'RATE_LIMIT_EXCEEDED'), 429);
 
 		const ID: string | boolean = extractValidID(pathname);
 
@@ -142,7 +156,13 @@ async function handler(req: Request, connInfo: Deno.ServeHandlerInfo): Promise<R
 		
 		const apiKey: string | null = getApiKeyFromRequest(req);
 
-		if (apiKey !== config.ADMIN_KEY) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'WRONG_API_KEY_FOR_DELETION'), 401);
+		if (apiKey !== config.ADMIN_KEY) {
+
+			printLogLine("WARN", "Invalid API or Admin key provided for deletion !");
+			
+			return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'error', 'WRONG_API_KEY_FOR_DELETION'), 401);
+		
+		}
 
 		else {
 
@@ -157,8 +177,6 @@ async function handler(req: Request, connInfo: Deno.ServeHandlerInfo): Promise<R
 	}
 
 	if (req.method === "GET" && pathname.startsWith("/url/")) {
-
-		if (!(await checkTimeRateLimit(hashedIP))) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'RATE_LIMIT_EXCEEDED'), 429);
 
 		const ID: string | boolean = extractValidID(pathname);
 
@@ -188,7 +206,7 @@ async function handler(req: Request, connInfo: Deno.ServeHandlerInfo): Promise<R
 
   	if (req.method === "POST" && pathname === "/post-url") {
 
-		if (!(await checkTimeRateLimit(hashedIP))) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'RATE_LIMIT_EXCEEDED'), 429);
+		if (!checkTimeRateLimit(hashedIP)) return createJsonResponse(buildLocalizedMessage(config.LANG_CODE, 'warning', 'RATE_LIMIT_EXCEEDED'), 429);
 
 		const data: UrlPostBody | null = await parseJsonBody<UrlPostBody>(req);
 

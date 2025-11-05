@@ -2,11 +2,17 @@
 
 A simple and lightweight URL shortener API built with [Deno](https://deno.land/)/[Wrangler](https://developers.cloudflare.com/workers/wrangler/) and [Firebase Realtime Database](https://firebase.google.com/products/realtime-database).
 
-I haven't picked a real name for the project yet, so I just called it: `nde-shortener`.
+[![Run on Replit](https://replit.com/badge/github/Nde-Code/nde-shortener)](https://replit.com/new/github/Nde-Code/nde-shortener)&nbsp;&nbsp;&nbsp;[![Deploy on Deno](https://deno.com/button)](https://console.deno.com/new?clone=https://github.com/Nde-Code/nde-shortener)
+
+> Make sure to configure your `.env` variables if you use these buttons.
+
+> I haven't picked a real name for the project yet, so I just called it: `nde-shortener`.
 
 ## 📦 Features:
 
 - Security comes first: secrets are stored in a `.env` file, with multiple validations performed before transmission.
+
+- Provides protection by limiting the daily request quota and preventing burst traffic, such as spam or rapid-fire requests.
 
 - No duplicate URLs (saves space in your database).
 
@@ -16,17 +22,11 @@ I haven't picked a real name for the project yet, so I just called it: `nde-shor
 
 - Highly configurable.
 
-- Generate short unique codes for URLs (avoid collisions).
-
-- Redirect users to original URLs.
-
 - Store mappings in Firebase Realtime Database.
 
 - Minimal and fast REST API.
 
 - Multi-language support for response messages.
-
-- `verify` and `delete` actions implemented.
 
 ## 🛡 GDPR Compliance:
 
@@ -34,15 +34,15 @@ This project is designed with **GDPR compliance** in mind:
 
 - ❌ No direct IP addresses or personal data are stored.
 
-- ❌ No logging of user activity. 
+- ❌ No user privacy information is logged.
 
 - ⚠️ **Basic rate limiting** is implemented by hashing **IP addresses**:
 
-  - Hashing is done using `SHA-256`, combined with a strong, secret **salt**.
+  - Hashing is done using `SHA-256`, combined with a **strong, secret salt**.
 
   - Hashes are stored only in an in-memory persistent database, typically referred to as a key-value store.
 
-  - IP hashes are automatically deleted after a configurable retention period (`IPS_PURGE_TIME_DAYS`). A duration of 24 hours is recommended for GDPR compliance.  
+  - IP hashes are automatically deleted after a configurable retention period.
 
 - ✅ No tracking, cookies, or analytics.
 
@@ -55,16 +55,16 @@ The API is available in two versions, each with its own usage details:
 ### Deno version:
 
 - *No public online instance is currently available.*
-- Rate limit: 1 request per second, with a daily cap of 10 new links added to the database.
-- Admin endpoints (`/urls`, `/delete/:code`, `/verify/:code`) are limited to 1 request per second.
+- Rate limit: 1 request per second, with a daily cap of 20 new links added to the database.
+- Admin endpoints (`/urls`, `/delete/:code`, `/verify/:code`) are limited to 1 request per second too.
 - Privacy policy: [privacy.md](privacy.md)
 - Source code: [GitHub repository](https://github.com/Nde-Code/nde-shortener)
 
 ### Cloudflare Workers version:
 
 - Public endpoint: [https://nsh.nde-code.workers.dev/](https://nsh.nde-code.workers.dev/)
-- Rate limit: 1 request per minute, with a daily cap of 10 new links added to the database.
-- Admin endpoint (`/urls`) is limited to 1 request per minute; other admin endpoints are not subject to rate limiting.
+- Rate limit: 1 request per second, with a daily cap of 20 new links added to the database.
+- Admin endpoints (`/urls`, `/delete/:code`, `/verify/:code`) are limited to 1 request per second too.
 - Privacy policy: [privacy.md (cf-workers branch)](https://github.com/Nde-Code/nde-shortener/blob/cf-workers/privacy.md)
 - Source code: [GitHub repository (cf-workers branch)](https://github.com/Nde-Code/nde-shortener/tree/cf-workers)
 
@@ -80,10 +80,10 @@ To use this **API endpoints** you can use:
 | Method | Endpoint           | Description                                                                 | Request Body                                 | Response                                                                                                                                       |
 |--------|--------------------|-----------------------------------------------------------------------------|----------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
 | **POST**   | `/post-url`        | Create a short URL from a long one.                                         | `{ "long_url": "https://example.com" }`      | `200 OK`: `{ "<localized_success>": "https://.../:code" }`  <br> `400 Bad Request`: Invalid body, missing `long_url`, unexpected field, or invalid URL format <br> `429 Too Many Requests`: Rate limit exceeded <br> `507 Insufficient Storage`: Database limit reached |
-| **GET**    | `/urls`            | Retrieve the full list of stored links. <br> **API/ADMIN key required**                               | *None*                                       | `200 OK`: `{ [code]: { long_url: string, post_date: string, is_verified: boolean } }` if link(s) or <br> `no URL(s)` otherwise <br> `401 Unauthorized`: Invalid API key                                       |
+| **GET**    | `/urls`            | Retrieve the full list of stored links. <br> **API/ADMIN key required**                               | *None*                                       | `200 OK`: `{ [code]: { long_url: string, post_date: string, is_verified: boolean } }` if link(s) or <br> `no URL(s)` otherwise <br> `401 Unauthorized`: Invalid API key  <br> `429 Too Many Requests`: Rate limit exceeded                                     |
 | **GET**    | `/url/:code`       | Redirect to the original long URL associated with the short code.           | *None*                                       | `301 Moved Permanently` (if `is_verified = false`) <br> `302 Found` (otherwise) <br> `404 Not Found`: Invalid or unknown code                  |
-| **PATCH**    | `/verify/:code`    | Mark the URL as verified (`is_verified = true`). <br> **API/ADMIN key required** | *None*                                       | `200 OK`: Verified successfully / Already verified <br> `404 Not Found` <br> `401 Unauthorized`: Invalid API key                               |
-| **DELETE**    | `/delete/:code`    | Delete a shortened URL from the database. <br> **API/ADMIN key required**     | *None*                                       | `200 OK`: Link deleted <br> `404 Not Found` <br> `401 Unauthorized`: Invalid API key                                                           |
+| **PATCH**    | `/verify/:code`    | Mark the URL as verified (`is_verified = true`). <br> **API/ADMIN key required** | *None*                                       | `200 OK`: Verified successfully / Already verified <br> `404 Not Found` <br> `401 Unauthorized`: Invalid API key <br> `429 Too Many Requests`: Rate limit exceeded                              |
+| **DELETE**    | `/delete/:code`    | Delete a shortened URL from the database. <br> **API/ADMIN key required**     | *None*                                       | `200 OK`: Link deleted <br> `404 Not Found` <br> `401 Unauthorized`: Invalid API key <br> `429 Too Many Requests`: Rate limit exceeded                                                          |
 
 ### Authentication
 
@@ -96,6 +96,8 @@ To access protected endpoints, you must include an API or ADMIN key in **the req
 ## 🚀 Getting Started:
 
 ### For those who want to create their own instance using Deno.
+
+> ### For those looking for the Wrangler (Cloudflare Workers) version, check out: [https://github.com/Nde-Code/nde-shortener/tree/cf-workers](https://github.com/Nde-Code/nde-shortener/tree/cf-workers)
 
 ### 1. Install deno, clone the project and go in the folder:
 
@@ -129,13 +131,13 @@ export const config: Config = {
     
   RATE_LIMIT_INTERVAL_S: 1, // min: 1
 
-  MAX_DAILY_WRITES: 10, // min: 1
+  MAX_DAILY_WRITES: 20, // min: 1
 
   IPS_PURGE_TIME_DAYS: 1, // min: 1
 
   FIREBASE_TIMEOUT_MS: 6000, // min: 1000
 
-  FIREBASE_ENTRIES_LIMIT: 500, // min: 50
+  FIREBASE_ENTRIES_LIMIT: 1000, // min: 50
 
   SHORT_URL_ID_LENGTH: 14, // min: 10
 
@@ -154,13 +156,13 @@ export const config: Config = {
 
 - **RATE_LIMIT_INTERVAL_S** in [second]: This is the rate limit based on requests. Currently: one request per second.
 
-- **MAX_DAILY_WRITES** in [day]: Daily writing rate limit (only applies if the link is not already in the database). Currently: 10 writes per day.
+- **MAX_DAILY_WRITES** in [day]: Daily writing rate limit (only applies if the link is not already in the database). Currently: 20 writes per day.
 
 - **IPS_PURGE_TIME_DAYS** in [day]: The number of days before purging the `Deno.kv` store that contains hashed IPs used for rate limiting. Currently: 1 day.
 
 - **FIREBASE_TIMEOUT_MS** in [millisecond]: The timeout limit for HTTP requests to the Firebase Realtime Database. Currently: 6 seconds.
 
-- **FIREBASE_ENTRIES_LIMIT**: The maximum number of entries allowed in your Firebase Realtime Database. Currently: 500 entries.
+- **FIREBASE_ENTRIES_LIMIT**: The maximum number of entries allowed in your Firebase Realtime Database. Currently: 1000 entries.
 
 - **SHORT_URL_ID_LENGTH**: The length of the shortcode used for shortened URLs. You should probably not change this value to ensure no collisions occur with `sha256`. Currently: 14 characters.
 
