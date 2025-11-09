@@ -4,7 +4,7 @@ A simple and lightweight URL shortener API built with [Deno](https://deno.land/)
 
 [![Run on Replit](https://replit.com/badge/github/Nde-Code/nde-shortener)](https://replit.com/new/github/Nde-Code/nde-shortener)&nbsp;&nbsp;&nbsp;[![Deploy on Deno](https://deno.com/button)](https://console.deno.com/new?clone=https://github.com/Nde-Code/nde-shortener)
 
-> Make sure to configure your `.env` variables if you use these buttons.
+> Make sure to configure your `.env` variables and the KV store if required by the platform when using these buttons.
 
 ## 📦 Features:
 
