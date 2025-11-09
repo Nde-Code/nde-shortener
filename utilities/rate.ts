@@ -34,6 +34,18 @@ function getCache(key: string): boolean {
 
 }
 
+export function checkTimeRateLimit(hashedIp: string, limitSeconds = config.RATE_LIMIT_INTERVAL_S): boolean {
+
+    const cacheKey: string = `ratelimit:${hashedIp}`;
+
+    if (getCache(cacheKey)) return false; 
+
+    setCache(cacheKey, limitSeconds);
+
+    return true;
+
+}
+
 setInterval(() => {
 
     const now = Date.now();
@@ -63,18 +75,6 @@ async function safeSetKv<T>(key: string[], value: T, expireInMs: number): Promis
         return false;
 
     }
-
-}
-
-export function checkTimeRateLimit(hashedIp: string, limitSeconds = config.RATE_LIMIT_INTERVAL_S): boolean {
-
-    const cacheKey: string = `ratelimit:${hashedIp}`;
-
-    if (getCache(cacheKey)) return false; 
-
-    setCache(cacheKey, limitSeconds);
-
-    return true;
 
 }
 
