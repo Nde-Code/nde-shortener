@@ -60,7 +60,7 @@ setInterval(() => {
 
 const kv = await Deno.openKv();
 
-async function safeSetKv<T>(key: string[], value: T, expireInMs: number): Promise<boolean> {
+async function safeSetKv<T>(key: string[], value: T, expireInMs: number, errorMessage = "KV put failed..."): Promise<boolean> {
 
     try {
 
@@ -70,7 +70,7 @@ async function safeSetKv<T>(key: string[], value: T, expireInMs: number): Promis
 
     } catch (_err) {
 
-        printLogLine("ERROR", "The KV hasn't been updated to increment the daily counter.")
+        printLogLine("ERROR", errorMessage)
 
         return false;
 
@@ -94,7 +94,7 @@ export async function checkDailyRateLimit(hashedIp: string): Promise<boolean> {
 
         const newWindow: WindowData = { startTimestamp: now, count: 1 };
 
-        return await safeSetKv(key, newWindow, purgeAfter);
+        return await safeSetKv(key, newWindow, purgeAfter, "The KV hasn't been updated to initialize the daily window.");
 
     }
 
@@ -104,7 +104,7 @@ export async function checkDailyRateLimit(hashedIp: string): Promise<boolean> {
 
         const newWindow: WindowData = { startTimestamp: now, count: 1 };
 
-        return await safeSetKv(key, newWindow, purgeAfter);
+        return await safeSetKv(key, newWindow, purgeAfter, "The KV hasn't been updated to reset the daily window.");
 
     }
 
@@ -112,7 +112,7 @@ export async function checkDailyRateLimit(hashedIp: string): Promise<boolean> {
 
     entry.value.count++;
 
-    return await safeSetKv(key, entry.value, purgeAfter - (now - startTimestamp));
+    return await safeSetKv(key, entry.value, purgeAfter - (now - startTimestamp), "The KV hasn't been updated to increment the daily counter.");
 
 }
 
