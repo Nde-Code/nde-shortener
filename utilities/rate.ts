@@ -1,6 +1,16 @@
 import { config } from "../config.ts";
 
+import { printLogLine } from "./utils.ts";
+
 interface CacheEntry { expireAt: number; }
+
+interface WindowData {
+
+    startTimestamp: number; 
+
+    count: number;         
+  
+}
 
 const cache = new Map<string, CacheEntry>();
 
@@ -38,6 +48,24 @@ setInterval(() => {
 
 const kv = await Deno.openKv();
 
+async function safeSetKv<T>(key: string[], value: T, expireInMs: number): Promise<boolean> {
+
+    try {
+
+        await kv.set(key, value, { expireIn: expireInMs });
+
+        return true;
+
+    } catch (_err) {
+
+        printLogLine("ERROR", "The KV hasn't been updated to increment the daily counter.")
+
+        return false;
+
+    }
+
+}
+
 export function checkTimeRateLimit(hashedIp: string, limitSeconds = config.RATE_LIMIT_INTERVAL_S): boolean {
 
     const cacheKey: string = `ratelimit:${hashedIp}`;
@@ -56,41 +84,27 @@ export async function checkDailyRateLimit(hashedIp: string): Promise<boolean> {
 
     const key: string[] = ["ip24hWindow", hashedIp];
 
-    type WindowData = { startTimestamp: number; count: number };
-
     const entry = await kv.get<WindowData>(key);
+
+    const purgeAfter: number = config.IPS_PURGE_TIME_DAYS * 24 * 60 * 60 * 1000;
+
+    const windowDuration: number = 24 * 60 * 60 * 1000; 
 
     if (!entry.value) {
 
-        const windowData: WindowData = { startTimestamp: now, count: 1 };
+        const newWindow: WindowData = { startTimestamp: now, count: 1 };
 
-        await kv.set(key, windowData, {
-
-            expireIn: config.IPS_PURGE_TIME_DAYS * 24 * 60 * 60 * 1000
-
-        });
-
-        return true;
+        return await safeSetKv(key, newWindow, purgeAfter);
 
     }
 
     const { startTimestamp, count } = entry.value;
 
-    const windowDuration = config.IPS_PURGE_TIME_DAYS * 24 * 60 * 60 * 1000;
-
     if (now - startTimestamp >= windowDuration) {
 
-        const windowData: WindowData = {
-            
-            startTimestamp: now,
-            
-            count: 1
-        
-        };
+        const newWindow: WindowData = { startTimestamp: now, count: 1 };
 
-        await kv.set(key, windowData, { expireIn: windowDuration });
-
-        return true;
+        return await safeSetKv(key, newWindow, purgeAfter);
 
     }
 
@@ -98,13 +112,7 @@ export async function checkDailyRateLimit(hashedIp: string): Promise<boolean> {
 
     entry.value.count++;
 
-    await kv.set(key, entry.value, {
-
-        expireIn: windowDuration - (now - startTimestamp)
-
-    });
-
-    return true;
+    return await safeSetKv(key, entry.value, purgeAfter - (now - startTimestamp));
 
 }
 
