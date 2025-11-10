@@ -1,5 +1,7 @@
 import { Config } from "../types/types.ts";
 
+import { config } from "../config.ts";
+
 export function isConfigValidWithMinValues(config: Config, rules: Partial<Record<keyof Config, number>>): boolean {
 
     for (const [key, minValue] of Object.entries(rules)) {
@@ -24,7 +26,6 @@ export function printLogLine(level: "INFO" | "WARN" | "ERROR", text: string) {
 
 }
 
-
 export function extractValidID(path: string): string | false {
 
 	const parts: string[] = path.split("/").filter(Boolean);
@@ -33,7 +34,7 @@ export function extractValidID(path: string): string | false {
 
 	if (!id) return false;
 
-	if (!/^[a-zA-Z0-9_-]{5,}$/.test(id)) return false;
+	if (!new RegExp(`^[a-zA-Z0-9_-]{${config.SHORT_URL_ID_LENGTH}}$`).test(id)) return false;
 
 	return id;
 
