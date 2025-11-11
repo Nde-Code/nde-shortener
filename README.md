@@ -103,6 +103,8 @@ First of all, you need to have [Deno](https://deno.com/) installed on your syste
 
 > Take a look at this page: [https://docs.deno.com/runtime/getting_started/installation/](https://docs.deno.com/runtime/getting_started/installation/)
 
+> I use VSCode as the code editor for this project, and the configuration is provided in [`.vscode/settings.json`](.vscode/settings.json). Make sure you have the Deno extension installed as well.
+
 Once that's done, clone this repository and go into the folder using:
 
 ```bash
